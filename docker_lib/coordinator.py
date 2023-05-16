@@ -6,12 +6,17 @@ import os
 import sys
 import datetime
 import subprocess
+import configparser
 import pandas as pd
 from Bio import SeqIO
 import csv
+import functions as ji
 
 # Reading input directory
-input = '/lab/input'
-output = '/lab/output'
-index = '/lab/database/PHROG_index.csv'
-logs = '/lab/output/docker_log.tsv'
+input = '/assemble/input'
+output = '/assemble/output'
+index = '/assemble/database/PHROG_index.csv'
+logs = '/assemble/output/phanatic_log.tsv'
+
+# Creating logfile
+ji.logfile("", "Checking input files", logs)

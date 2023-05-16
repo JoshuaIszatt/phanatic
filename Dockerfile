@@ -11,7 +11,7 @@ RUN apt-get update \
 RUN mkdir -p /assemble \
     && mkdir -p /assemble/input \
     && mkdir -p /assemble/output \
-    && mkdir -p /assemble/database \
+    && mkdir -p /assemble/checkv-db-v1.5 \
     && mkdir -p /assemble/build \
     && mkdir -p /assemble/bin
 
@@ -34,7 +34,7 @@ COPY ./docker_lib/* /assemble/bin/
 RUN echo 'export PATH="/assemble/bin:$PATH"' >> ~/.bashrc
 
 # Copying database over
-COPY ./database/checkv-db-v1.5 /assemble/database
+COPY ./database/checkv-db-v1.5 /assemble/checkv-db-v1.5/
 
 # Setting entry
 WORKDIR /assemble
