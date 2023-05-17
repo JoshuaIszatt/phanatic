@@ -5,6 +5,9 @@ import datetime
 import configparser
 import subprocess
 import csv
+import random
+from Bio import SeqIO
+from Bio.SeqIO.FastaIO import SimpleFastaParser
 
 ## CONFIGURATION
 
@@ -76,6 +79,23 @@ def check_filepath(filepath, create=False):
         else:
             print(f"Cannot find {filepath}")
             sys.exit(1)
+
+def generate_unique_tag(length, existing_tags):
+    characters = "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    while True:
+        password = "".join(random.sample(characters, length))
+        if password not in existing_tags:
+            return password
+
+def create_csv(filename, data):
+    with open(filename, 'w', newline='') as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerows(data)
+
+def append_csv(filename, data):
+    with open(filename, 'a', newline='') as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow(data)
 
 def find_read_pairs(input_dir):
     read_pairs = []
@@ -226,7 +246,7 @@ def filter_genome(infile, outdir, name):
 
 def checkv(infile, outdir, name):
     
-    outfile = f"{outdir}/{name}/complete_genomes.tsv"
+    outfile = f"{outdir}/{name}"
     
     command = [
         "checkv", "end_to_end",
@@ -240,5 +260,30 @@ def checkv(infile, outdir, name):
     except subprocess.CalledProcessError:
         logfile("CheckV failed", name, logs)
 
-def extract(contigs, checkv):
-    pass
+def find_complete_genomes(checkv, name):
+    genomes = []
+    with open(checkv) as tsvfile:
+        read = csv.reader(tsvfile, delimiter='\t')
+        next(read)
+        for row in read:
+            genomes.append(row[0])
+    genomes = tuple(genomes)
+    logfile("C-Extraction", name, logs)
+    return genomes
+
+def find_hq_genomes(checkv, name):
+    genomes = []
+    with open(checkv) as tsvfile:
+        read = csv.reader(tsvfile, delimiter='\t')
+        next(read)
+        for row in read:
+            if 'High-quality' == row[7]:
+                genomes.append(row[0])
+    genomes = tuple(genomes)
+    logfile("HQ-Extraction", name, logs)
+    return genomes
+    
+def extract_genomes(contigs, headers, outdir):
+    extracted_genomes = []
+    
+        

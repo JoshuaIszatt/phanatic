@@ -40,9 +40,10 @@ dedupe_dir = os.path.join(output, "deduped")
 merged_dir = os.path.join(output, "merged")
 norm_dir = os.path.join(output, "normalised")
 spades_dir = os.path.join(output, "spades")
-raw_genome_dir = os.path.join(output, "raw_assembly")
+filtered_dir = os.path.join(output, "filtered_contigs")
 checkv_dir = os.path.join(output, "checkv")
-qualimap_dir = os.path.join(output, "qualimap")
+extraction_dir = os.path.join(output, "genome_extractions")
+
 
 # Phanatic run 
 for pair in pairs:
@@ -72,7 +73,7 @@ for pair in pairs:
         continue
         
     if ji.check_filepath(assembly):
-        filtered = ji.filter_genome(assembly, raw_genome_dir, pair.name)
+        filtered = ji.filter_genome(assembly, filtered_dir, pair.name)
     else:
         continue
     
@@ -81,24 +82,30 @@ for pair in pairs:
         checkv = ji.checkv(filtered, checkv_dir, pair.name)
     else:
         continue
-        
-    # Extraction
-    if ji.check_filepath(checkv):
-        
+
+    # Extractions
+    complete_genomes = os.path.join(checkv, "complete_genomes.tsv")
+    quality_summary = os.path.join(checkv, "quality_summary.tsv")
+    
+    if ji.check_filepath(complete_genomes):
+        complete = ji.find_complete_genomes(complete_genomes, pair.name)
+    else:
+        continue
+    
+    if ji.check_filepath(quality_summary):
+        hq = ji.find_hq_genomes(quality_summary, pair.name)
+    else:
+        continue
+    
+    if len(complete) + len(hq) == 0:
+        continue
+    else:
+        extracted_genomes = ji.extract_genomes(complete, hq, extraction_dir)
+    
     
     # Quality checks
+
+    # Coverage calculation
     
     # Barcoding
-    
-    
-    
-        
-    
-    
-
-
-    
-    
-
-    
     
