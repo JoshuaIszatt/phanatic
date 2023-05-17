@@ -7,7 +7,6 @@ import sys
 import datetime
 import subprocess
 import configparser
-import pandas as pd
 from Bio import SeqIO
 import csv
 import functions as ji
@@ -28,7 +27,7 @@ else:
 # Phanatic settings
 enable_normalise = config["pipeline"]["normalise"]
 enable_filter = config["pipeline"]["filter"]
-enable_qualimap = config["pipeline"]["qualimap"]
+enable_qc = config["pipeline"]["fastqc"]
 enable_extract = config["pipeline"]["extract"]
 
 # Reading input files
@@ -53,23 +52,43 @@ for pair in pairs:
     
     if ji.check_filepath(trim):
         deduped = ji.remove_duplicate_reads(trim, dedupe_dir, pair.name)
+    else:
+        continue
         
     if ji.check_filepath(deduped):
         merged, unmerged = ji.merge_reads(deduped, merged_dir, pair.name)
+    else:
+        continue
 
     if ji.check_filepath(merged):
         normalised = ji.normalise_reads(merged, norm_dir, pair.name)
+    else:
+        continue
 
     # Assembly
     if ji.check_filepath(normalised):
         assembly = ji.PE_assembly(normalised, unmerged, spades_dir, pair.name)
+    else:
+        continue
         
     if ji.check_filepath(assembly):
         filtered = ji.filter_genome(assembly, raw_genome_dir, pair.name)
-        
+    else:
+        continue
+    
     # CheckV
     if ji.check_filepath(filtered):
         checkv = ji.checkv(filtered, checkv_dir, pair.name)
+    else:
+        continue
+        
+    # Extraction
+    if ji.check_filepath(checkv):
+        
+    
+    # Quality checks
+    
+    # Barcoding
     
     
     

@@ -45,7 +45,7 @@ Run the help command to see options
 | biopython | 1.78 | -------- | -------- |
 | checkv | 1.0.1 | -------- | -------- |
 | checkv-db | 1.5 | -------- | -------- |
-| qualimap | 2.2.2a | -------- | -------- |
+| fastqc | 0.11.9 | Quality control for reads | -------- |
 
 ## Docker tags
 https://hub.docker.com/r/iszatt

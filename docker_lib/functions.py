@@ -93,7 +93,7 @@ def find_read_pairs(input_dir):
             else:
                 logfile("Input file", f"No second read file found for: {name}", logs)
         
-    logfile("Finish", f"Read pairs = {len(read_pairs)}", logs)
+    logfile("Pairing input files", f"Read pairs = {len(read_pairs)}", logs)
     return read_pairs
 
 def PE_trim(read_pair, outdir):
@@ -240,3 +240,5 @@ def checkv(infile, outdir, name):
     except subprocess.CalledProcessError:
         logfile("CheckV failed", name, logs)
 
+def extract(contigs, checkv):
+    pass
