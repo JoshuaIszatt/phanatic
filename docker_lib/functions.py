@@ -239,3 +239,4 @@ def checkv(infile, outdir, name):
         return outfile
     except subprocess.CalledProcessError:
         logfile("CheckV failed", name, logs)
+

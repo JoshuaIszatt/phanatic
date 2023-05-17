@@ -16,7 +16,7 @@ import functions as ji
 input = '/assemble/input'
 output = '/assemble/output'
 
-# Configuring functions
+# Configuring pipeline
 config_file = "/assemble/output/config.ini"
 config = configparser.ConfigParser()
 if os.path.isfile(config_file):
@@ -26,10 +26,10 @@ else:
     config.read(config_file)
 
 # Phanatic settings
-enable_normalise = config["functions"]["normalise"]
-enable_filter = config["functions"]["filter"]
-enable_qualimap = config["functions"]["qualimap"]
-enable_extract = config["functions"]["extract"]
+enable_normalise = config["pipeline"]["normalise"]
+enable_filter = config["pipeline"]["filter"]
+enable_qualimap = config["pipeline"]["qualimap"]
+enable_extract = config["pipeline"]["extract"]
 
 # Reading input files
 pairs = ji.find_read_pairs(input)
@@ -70,7 +70,8 @@ for pair in pairs:
     # CheckV
     if ji.check_filepath(filtered):
         checkv = ji.checkv(filtered, checkv_dir, pair.name)
-        
+    
+    
     
         
     
