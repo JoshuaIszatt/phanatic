@@ -4,8 +4,20 @@
 
 This python script (phanatic.py) will run a docker container to assemble genomes 'de novo' using SPAdes (version number below in third party software).
 
-## Open source citation:
-If you use this software please cite below and look at the third party software to cite the correct versions of software utilised by this container.
+## Associated publications:
+1. [Genome Sequences of Two Lytic Staphylococcus aureus Bacteriophages Isolated from Wastewater](https://journals.asm.org/doi/10.1128/mra.00954-22)
+2. [Genome Sequence of a Lytic Staphylococcus aureus Bacteriophage Isolated from Breast Milk](https://journals.asm.org/doi/10.1128/mra.00953-22)
+3. [Complete Genome Sequences of Four Pseudomonas aeruginosa Bacteriophages: Kara-mokiny 8, Kara-mokiny 13, Kara-mokiny 16, and Boorn-mokiny 1](https://journals.asm.org/doi/10.1128/mra.00960-22)
+
+## FUNCTIONS
+The main functions of phanatic are:
+* De novo assembly for phages
+* Quality checks run using qualimap
+* Extraction of 'Complete' and 'High-quality' contigs determined by CheckV
+* CSV file with details of the assembly for each 
+
+## Citation:
+If you use this software please cite the source code as below and look at the third party software to cite the correct versions of software utilised by this container.
 ```
 Iszatt J.(2023).Phanatic(v2.2.0)[Source code].Github:https://github.com/JoshuaIszatt/Phanatic
 ```
@@ -16,17 +28,7 @@ Install using pip
 
 ```
 
-Run the command directly 
-```sh
-
-```
-
-## Run the docker container directly
-```sh
-
-```
-
-Run the docker image using:
+Run the help command to see options 
 ```sh
 
 ```

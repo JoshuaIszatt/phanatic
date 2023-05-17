@@ -13,8 +13,8 @@ prompts = [
     "Phanatic currently only supports short, paired end, illumina reads (default 'PE_illumina_150').",
     "I (J. Iszatt) made Phanatic to assemble S. aureus phage genomes as part of my PhD project.",
     "This is a short read assembler primarily designed for bacteriophage",
-    "Use the --nanopore flag to include long read sequencing in your assembly",
-    "My favourite bacteriophage is a Silviavirus named Koomba-kaat_1"
+    "My favourite bacteriophage is a Silviavirus named Koomba-kaat_1",
+    "You can use your own config file to customise the assembly and functions"
 ]
 random_prompt = random.choice(prompts)
 
@@ -46,13 +46,26 @@ parser.add_argument('-i', '--input', type=valid_dir, help='Input reads files')
 parser.add_argument('-o', '--output', type=valid_dir, help='Direct output to this location')
 parser.add_argument('-r', '--reads', type=str, choices=['PE_illumina_150'], default='PE_illumina_150', help='Pipeline options')
 parser.add_argument('-c', '--config', type=valid_file, help='Use config file to customise assembly')
-#parser.add_argument('--nanopore', action="store_true", help='Detect and utilise nanopore reads')
+parser.add_argument('-v', '--version', action="store_true", help='Print the docker image version')
 parser.add_argument('--manual', action="store_true", help='Enter container interactively')
 args = parser.parse_args()
 
-# Obtaining absolute paths
-input_path = os.path.abspath(args.input)
-output_path = os.path.abspath(args.output)
+# Printing version
+if args.version:
+    print(image)
+    sys.exit(0)
+
+# Obtaining absolute paths if entered correctly
+if args.input and args.output:
+    input_path = os.path.abspath(args.input)
+    output_path = os.path.abspath(args.output)
+elif args.input and not args.output:
+    sys.exit("No output directory specified\nRun --help to see options")
+elif args.output and not args.input:
+    sys.exit("No input directory specified\nRun --help to see options")
+else:
+    sys.exit("No input or output directories specified\nRun --help to see options")
+    
 
 # Printing command variables
 print(
@@ -60,7 +73,7 @@ print(
     f"Input path: {input_path}",
     f"Output path: {output_path}",
     f"Reads type: {args.reads}",
-    ">>>\n",
+    ">>>",
     f"Did you know:",
     f"{random_prompt}",
     ">>>\n",

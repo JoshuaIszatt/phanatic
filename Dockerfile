@@ -11,7 +11,7 @@ RUN apt-get update \
 RUN mkdir -p /assemble \
     && mkdir -p /assemble/input \
     && mkdir -p /assemble/output \
-    && mkdir -p /assemble/checkv-db-v1.5 \
+    && mkdir -p /assemble/database/checkv-db-v1.5 \
     && mkdir -p /assemble/build \
     && mkdir -p /assemble/bin
 
@@ -27,14 +27,15 @@ ENV PATH="/assemble/build/SPAdes-3.15.4-Linux/bin:${PATH}"
 COPY ./assemble.txt /assemble/build
 RUN conda create --name assemble --file /assemble/build/assemble.txt \
     && conda init bash
-RUN echo "conda activate" >> ~/.bashrc
+RUN echo "conda activate assemble" >> ~/.bashrc
 
 # Adding scripts
 COPY ./docker_lib/* /assemble/bin/
 RUN echo 'export PATH="/assemble/bin:$PATH"' >> ~/.bashrc
 
-# Copying database over
-COPY ./database/checkv-db-v1.5 /assemble/checkv-db-v1.5/
+# Copying database and default config over
+COPY ./database/ /assemble/database
+COPY ./config.ini /assemble
 
 # Setting entry
 WORKDIR /assemble
