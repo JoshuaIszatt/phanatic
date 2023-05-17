@@ -97,11 +97,14 @@ for pair in pairs:
     else:
         continue
     
-    if len(complete) + len(hq) == 0:
+    headers = complete+hq
+    if len(headers) == 0:
         continue
     else:
-        extracted_genomes = ji.extract_genomes(complete, hq, extraction_dir)
-    
+        extracted_genomes = ji.extract_genomes(filtered, 
+                                               headers, 
+                                               extraction_dir,
+                                               pair.name)
     
     # Quality checks
 

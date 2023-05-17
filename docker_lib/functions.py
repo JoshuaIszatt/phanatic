@@ -283,7 +283,28 @@ def find_hq_genomes(checkv, name):
     logfile("HQ-Extraction", name, logs)
     return genomes
     
-def extract_genomes(contigs, headers, outdir):
-    extracted_genomes = []
+def extract_genomes(contigs, headers, outdir, name):
     
+    genomes = []
+    
+    for header in headers:
+        logfile(f"Extracting genome", header, logs)
+
+        phage = f""
+        outfile = f"{outdir}/{phage}"
+        
+        handle = open(contigs)
+        textfile = open(outfile, 'w')
+        entries = list(SimpleFastaParser(handle)) 
+        for name, seq in entries: 	
+            if header in name: 		
+                print(f">{phage}\n{seq}\n", file=textfile)
+                genomes.append(outfile)
+        
+        if len(headers) == len(genomes):
+            logfile("All genomes extracted", name, logs)
+            return genomes
+        elif len(headers) < len(extract_genomes):
+            logfile("ERROR", name, logs)
+        
         
