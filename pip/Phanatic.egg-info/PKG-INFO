@@ -1,0 +1,18 @@
+Metadata-Version: 2.1
+Name: Phanatic
+Version: 2.2.0
+Summary: Python package to run de novo bacteriophage assembly container.
+Home-page: https://github.com/JoshuaIszatt/Phanatic
+Author: Joshua Iszatt
+Author-email: joshiszatt@gmail.com
+License: AGPL-3.0
+Classifier: Development Status :: 2 - Pre-Alpha
+Classifier: License :: OSI Approved :: GNU Affero General Public License v3
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Requires-Python: >=3.6
+License-File: LICENSE.md

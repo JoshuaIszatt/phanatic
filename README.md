@@ -23,14 +23,16 @@ Iszatt J.(2023).Phanatic(v2.2.0)[Source code].Github:https://github.com/JoshuaIs
 ```
 
 ## Installation
+To run this pipeline you first need a working docker installation. 
+
 Install using pip
 ```sh
-
+pip install Phanatic==2.2.0
 ```
 
 Run the help command to see options 
 ```sh
-
+phanatic.py -h
 ```
 
 ## Output
