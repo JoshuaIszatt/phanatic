@@ -41,16 +41,20 @@ memory_gb = int(config["SPAdes"]["memory_gb"])
 
 filter_length = int(config["filter"]["filter_length"])
 
+prefix = config["barcoding"]["prefix"]
+barcode_length = int(config["barcoding"]["barcode_length"])
 
 ###_______________________________________________________________________________________
 
 ## CLASSES
 
 class Pair(object):
-    def __init__(self, name, read_1, read_2, filter=None):
+    def __init__(self, name, read_1, read_2):
         self.name = name;
         self.read_1 = read_1;
         self.read_2 = read_2;
+        
+        
 
 ###_______________________________________________________________________________________
 
@@ -80,12 +84,14 @@ def check_filepath(filepath, create=False):
             print(f"Cannot find {filepath}")
             sys.exit(1)
 
-def generate_unique_tag(length, existing_tags):
+def generate_unique_tag(existing_tags):
     characters = "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
     while True:
-        password = "".join(random.sample(characters, length))
-        if password not in existing_tags:
-            return password
+        password = "".join(random.sample(characters, barcode_length))
+        tag = f"{prefix}_{password}"
+        if tag not in existing_tags:
+            logfile("Barcoding", f"Tag gen: {tag}", logs)
+            return tag
 
 def create_csv(filename, data):
     with open(filename, 'w', newline='') as csvfile:
@@ -141,10 +147,10 @@ def PE_trim(read_pair, outdir):
     ]
     try:
         subprocess.run(command, check=True)
-        logfile("Trim", f"{read_pair.name}", logs)
+        logfile("Trimming", f"{read_pair.name}: success", logs)
         return outfile
     except subprocess.CalledProcessError:
-        logfile("Trim fail", f"{read_pair.name}", logs)
+        logfile("Trimming", f"{read_pair.name}: failed", logs)
 
 def remove_duplicate_reads(infile, outdir, name):
     
@@ -161,10 +167,10 @@ def remove_duplicate_reads(infile, outdir, name):
     ]
     try:
         subprocess.run(command, check=True)
-        logfile("Dedupe", name, logs)
+        logfile("Dedupe", f"{name}: success", logs)
         return outfile
     except subprocess.CalledProcessError:
-        logfile("Dedupe fail", name, logs)
+        logfile("Dedupe", f"{name}: failed", logs)
         
 def merge_reads(infile, outdir, name):
     
@@ -182,10 +188,10 @@ def merge_reads(infile, outdir, name):
     ]
     try:
         subprocess.run(command, check=True)
-        logfile("Merge", name, logs)
+        logfile("Merge", f"{name}: success", logs)
         return outfile_merged, outfile_unmerged
     except subprocess.CalledProcessError:
-        logfile("Merge fail", name, logs)
+        logfile("Merge fail", f"{name}: failed", logs)
     
     
 def normalise_reads(infile, outdir, name):
@@ -202,10 +208,10 @@ def normalise_reads(infile, outdir, name):
     ]
     try:
         subprocess.run(command, check=True)
-        logfile("Normalise", name, logs)
+        logfile("Normalise", f"{name}: success", logs)
         return outfile
     except subprocess.CalledProcessError:
-        logfile("Normalise", name, logs)
+        logfile("Normalise", f"{name}: failed", logs)
 
 def PE_assembly(infile_1, infile_2, outdir, name):
 
@@ -222,27 +228,37 @@ def PE_assembly(infile_1, infile_2, outdir, name):
     ]
     try:
         subprocess.run(command, check=True)
-        logfile("Assembly", name, logs)
+        logfile("Assembly", f"{name}: success", logs)
         return f"{outdir}/{name}/contigs.fasta"
     except subprocess.CalledProcessError:
-        logfile("Assembly failed", name, logs)
+        logfile("Assembly", f"{name}: failed", logs)
 
-def filter_genome(infile, outdir, name):
+def format_genome(infile, outdir, name, filter=False):
     
     outfile = f"{outdir}/{name}.fasta"
 
-    command = [
-        "reformat.sh",
-        f"in={infile}",
-        f"out={outfile}",
-        f"minlength={filter_length}"
-    ]
+    if filter:
+        command = [
+            "reformat.sh",
+            f"in={infile}",
+            f"out={outfile}",
+            f"minlength={filter_length}"
+        ]
+        note = "Filtering"
+    else:
+        command = [
+            "reformat.sh",
+            f"in={infile}",
+            f"out={outfile}",
+            "minlength=0"
+        ]
+        note = "Formatting"
     try:
         subprocess.run(command, check=True)
-        logfile("Filter", name, logs)
+        logfile(note, f"{name}: success", logs)
         return outfile
     except subprocess.CalledProcessError:
-        logfile("Filter failed", name, logs)
+        logfile(note, f"{name}: failed", logs)
 
 def checkv(infile, outdir, name):
     
@@ -255,10 +271,10 @@ def checkv(infile, outdir, name):
     ]
     try:
         subprocess.run(command, check=True)
-        logfile("CheckV", name, logs)
+        logfile("CheckV", f"{name}: success", logs)
         return outfile
     except subprocess.CalledProcessError:
-        logfile("CheckV failed", name, logs)
+        logfile("CheckV", f"{name}: failed", logs)
 
 def find_complete_genomes(checkv, name):
     genomes = []
@@ -268,7 +284,7 @@ def find_complete_genomes(checkv, name):
         for row in read:
             genomes.append(row[0])
     genomes = tuple(genomes)
-    logfile("C-Extraction", name, logs)
+    logfile("Finding complete genomes", name, logs)
     return genomes
 
 def find_hq_genomes(checkv, name):
@@ -280,31 +296,55 @@ def find_hq_genomes(checkv, name):
             if 'High-quality' == row[7]:
                 genomes.append(row[0])
     genomes = tuple(genomes)
-    logfile("HQ-Extraction", name, logs)
+    logfile("Finding high-quality genomes", name, logs)
     return genomes
     
-def extract_genomes(contigs, headers, outdir, name):
-    
-    genomes = []
-    
-    for header in headers:
-        logfile(f"Extracting genome", header, logs)
+def extract_genome(contigs, header, outdir, name):
+    outfile = f"{outdir}/{name}_{header}.fasta"
+    phage = f"{name}_{header}"
+        
+    handle = open(contigs)
+    textfile = open(outfile, 'w')
+    entries = list(SimpleFastaParser(handle)) 
+    for name, seq in entries: 	
+        if header in name: 		
+            print(f">{phage}\n{seq}\n", file=textfile)
+            logfile("Genome extracted", phage, logs)
+            return outfile
 
-        phage = f""
-        outfile = f"{outdir}/{phage}"
-        
-        handle = open(contigs)
-        textfile = open(outfile, 'w')
-        entries = list(SimpleFastaParser(handle)) 
-        for name, seq in entries: 	
-            if header in name: 		
-                print(f">{phage}\n{seq}\n", file=textfile)
-                genomes.append(outfile)
-        
-        if len(headers) == len(genomes):
-            logfile("All genomes extracted", name, logs)
-            return genomes
-        elif len(headers) < len(extract_genomes):
-            logfile("ERROR", name, logs)
-        
-        
+def coverage_calculation(genome, reads, outdir, name):
+    
+    cov_out = f"{outdir}/{name}"
+    
+    command = [
+        "bbmap.sh", 
+        f"-Xmx{memory}",
+        f"ref={genome}",
+        f"in={reads}",
+        f"covstats={cov_out}"
+    ]
+    try:
+        subprocess.run(command, check=True)
+        logfile("Coverage", f"{name}: success", logs)
+    except subprocess.CalledProcessError:
+        logfile("Coverage", f"{name}: failed", logs)
+    
+def fastqc(reads, outdir):
+    
+    command = [
+        "fastqc",
+        f"{reads}",
+        f"-o {outdir}"
+    ]
+    try:
+        subprocess.run(command, check=True)
+        logfile("Reads QC", "success", logs)
+    except subprocess.CalledProcessError:
+        logfile("Reads QC", "failed", logs)
+
+def barcode_phage(original, tag, outdir):
+    original_name = os.path.basename(original)
+    new = os.path.join(outdir, tag)
+    os.system(f"cp {original} {new}")
+    logfile("BARCODE", f"{original_name}:{tag}", logs)
+

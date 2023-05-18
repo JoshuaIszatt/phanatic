@@ -11,9 +11,10 @@ from Bio import SeqIO
 import csv
 import functions as ji
 
-# Reading input directory
+# Reading inputs
 input = '/assemble/input'
 output = '/assemble/output'
+logs = "/assemble/output/phanatic_log.tsv"
 
 # Configuring pipeline
 config_file = "/assemble/output/config.ini"
@@ -25,10 +26,14 @@ else:
     config.read(config_file)
 
 # Phanatic settings
-enable_normalise = config["pipeline"]["normalise"]
-enable_filter = config["pipeline"]["filter"]
-enable_qc = config["pipeline"]["fastqc"]
-enable_extract = config["pipeline"]["extract"]
+try:
+    enable_normalise = config.getboolean("pipeline", "normalise")
+    enable_filter = config.getboolean("pipeline", "filter")
+    enable_qc = config.getboolean("pipeline", "fastqc")
+    enable_barcodes = config.getboolean("pipeline", "barcode")
+    enable_clean = config.getboolean("pipeline", "clean_up")
+except ValueError:
+    sys.exit("Config file incorrectly set, pipeline values must be booleans")
 
 # Reading input files
 pairs = ji.find_read_pairs(input)
@@ -43,7 +48,14 @@ spades_dir = os.path.join(output, "spades")
 filtered_dir = os.path.join(output, "filtered_contigs")
 checkv_dir = os.path.join(output, "checkv")
 extraction_dir = os.path.join(output, "genome_extractions")
+format_dir = os.path.join(output, "format_dir")
+coverage_dir = os.path.join(output, "coverage_dir")
+barcode_dir = os.path.join(output, "barcode_phage")
 
+if enable_qc:
+    ji.logfile("pipeline options", "QC enabled", logs)
+    qc_dir = os.path.join(output, "reads_quality")
+    os.makedirs(qc_dir)
 
 # Phanatic run 
 for pair in pairs:
@@ -61,19 +73,26 @@ for pair in pairs:
     else:
         continue
 
-    if ji.check_filepath(merged):
-        normalised = ji.normalise_reads(merged, norm_dir, pair.name)
+    if enable_normalise:
+        if ji.check_filepath(merged):
+            normalised = ji.normalise_reads(merged, norm_dir, pair.name)
+        else:
+            continue
+        assemble_reads = normalised
     else:
-        continue
-
+        assemble_reads = merged
+    
     # Assembly
-    if ji.check_filepath(normalised):
-        assembly = ji.PE_assembly(normalised, unmerged, spades_dir, pair.name)
+    if ji.check_filepath(assemble_reads):
+        assembly = ji.PE_assembly(assemble_reads, unmerged, spades_dir, pair.name)
     else:
         continue
         
     if ji.check_filepath(assembly):
-        filtered = ji.filter_genome(assembly, filtered_dir, pair.name)
+        if enable_filter:
+            filtered = ji.format_genome(assembly, filtered_dir, pair.name, filter=True)
+        else:
+            filtered = ji.format_genome(assembly, filtered_dir, pair.name)
     else:
         continue
     
@@ -96,19 +115,77 @@ for pair in pairs:
         hq = ji.find_hq_genomes(quality_summary, pair.name)
     else:
         continue
-    
+
     headers = complete+hq
+    ji.logfile("Expected genomes", f"{pair.name}: {len(headers)}", logs)
+    
     if len(headers) == 0:
+        ji.logfile("Sample failed", pair.name, logs)
         continue
     else:
-        extracted_genomes = ji.extract_genomes(filtered, 
-                                               headers, 
-                                               extraction_dir,
-                                               pair.name)
-    
-    # Quality checks
+        if not os.path.exists(extraction_dir):
+            os.makedirs(extraction_dir)
+
+    genomes = []
+    for header in headers:
+        extraction = ji.extract_genome(filtered, 
+                                        header, 
+                                        extraction_dir, 
+                                        pair.name)
+        genomes.append(extraction)
+
+    if len(genomes) == 0:
+        continue
+    else:
+        ji.logfile("Genomes extracted", f"{pair.name}: {len(genomes)}", logs)
+
+    for genome in genomes:
+        name = os.path.basename(genome).replace(".fasta", "")
+        format_genomes = ji.format_genome(genome, format_dir, name)
 
     # Coverage calculation
+    for genome in format_genomes:
+        name = os.path.basename(genome).replace(".fasta", "")
+        ji.coverage_calculation(genome, assemble_reads, coverage_dir, name)
+                
+    # Quality checks
+    if enable_qc:
+        if enable_normalise:
+            ji.fastqc(normalised, qc_dir)
+        else:
+            ji.fastqc(merged, qc_dir)  
     
-    # Barcoding
+    # Sample finish
+    ji.logfile("Sample run complete", pair.name, logs)
     
+# Barcoding
+if enable_barcodes:
+    ji.logfile("Barcoding", "-----", logs)
+    os.makedirs(barcode_dir)
+    tags = []
+    for file in os.listdir(format_dir):
+        filepath = os.path.join(format_dir, genome)
+        new_tag = ji.generate_unique_tag(tags)
+        tags.append(new_tag)
+        ji.barcode_phage(filepath, new_tag, barcode_dir)
+
+# Cleaning up
+if enable_clean:
+    ji.logfile("Cleaning raw data", "-----", logs)
+    remove = [trim_dir, 
+              dedupe_dir, 
+              merged_dir, 
+              norm_dir, 
+              spades_dir, 
+              filtered_dir,
+              extraction_dir
+              ]
+    for data in remove:
+        try:
+            os.system(f"rm -rf {data}")
+        except:
+            continue
+
+# Phanatic finish
+ji.logfile("Phanatic finished", "-----", logs)
+os.system(f"chmod -R 777 {output}/*")

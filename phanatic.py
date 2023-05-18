@@ -85,6 +85,11 @@ if args.config:
     print(f"Using {args.config} file \n")
     os.system(f"cp {args.config} {args.output}/config.ini")
 
+if args.show_console:
+    docker = "docker run"
+else:
+    docker = "docker run -d"
+
 # Running docker
 if args.manual: 
     os.system(f"docker exec -it \
@@ -93,7 +98,7 @@ if args.manual:
         -v {output_path}:/assemble/output \
         {image} sleep 1d) bash")
 else:
-    command = ["docker run -d -v %s:/assemble/input -v %s:/assemble/output %s /assemble/bin/assemble.sh" %
-            (input_path, output_path, image)]
+    command = ["%s -v %s:/assemble/input -v %s:/assemble/output %s /assemble/bin/assemble.sh" %
+            (docker, input_path, output_path, image)]
     result = subprocess.Popen(command, shell=True)
     print(command)
