@@ -122,9 +122,9 @@ for pair in pairs:
     if len(headers) == 0:
         ji.logfile("Sample failed", pair.name, logs)
         continue
-    else:
-        if not os.path.exists(extraction_dir):
-            os.makedirs(extraction_dir)
+    
+    if not os.path.exists(extraction_dir):
+        os.makedirs(extraction_dir)
 
     genomes = []
     for header in headers:
@@ -134,20 +134,19 @@ for pair in pairs:
                                         pair.name)
         genomes.append(extraction)
 
-    if len(genomes) == 0:
-        continue
-    else:
-        ji.logfile("Genomes extracted", f"{pair.name}: {len(genomes)}", logs)
+    ji.logfile("Genomes extracted", f"{pair.name}: {len(genomes)}", logs)
 
+    formatted_genomes = []
     for genome in genomes:
         name = os.path.basename(genome).replace(".fasta", "")
-        format_genomes = ji.format_genome(genome, format_dir, name)
+        format_genome = ji.format_genome(genome, format_dir, name)
+        formatted_genomes.append(format_genome)
 
     # Coverage calculation
-    for genome in format_genomes:
+    for genome in formatted_genomes:
         name = os.path.basename(genome).replace(".fasta", "")
         ji.coverage_calculation(genome, assemble_reads, coverage_dir, name)
-                
+    
     # Quality checks
     if enable_qc:
         if enable_normalise:

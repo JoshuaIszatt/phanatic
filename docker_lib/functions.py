@@ -123,14 +123,11 @@ def find_read_pairs(input_dir):
     return read_pairs
 
 def PE_trim(read_pair, outdir):
-    
     read_1 = read_pair.read_1
     read_2 = read_pair.read_2
     outfile = f"{outdir}/{read_pair.name}.fastq"
-    
     tl = 0+trim_length
     tr = read_length-trim_length
-    
     command = [
         "bbduk.sh",
         f"-Xmx{memory}",
@@ -153,9 +150,7 @@ def PE_trim(read_pair, outdir):
         logfile("Trimming", f"{read_pair.name}: failed", logs)
 
 def remove_duplicate_reads(infile, outdir, name):
-    
     outfile = f"{outdir}/{name}.fastq"
-    
     command = [
         "dedupe.sh",
         f"-Xmx{memory}",
@@ -173,10 +168,8 @@ def remove_duplicate_reads(infile, outdir, name):
         logfile("Dedupe", f"{name}: failed", logs)
         
 def merge_reads(infile, outdir, name):
-    
     outfile_merged = f"{outdir}/{name}_merged.fastq"
     outfile_unmerged = f"{outdir}/{name}_unmerged.fastq"
-    
     command = [
         "bbmerge.sh",
         f"-Xmx{memory}",
@@ -195,9 +188,7 @@ def merge_reads(infile, outdir, name):
     
     
 def normalise_reads(infile, outdir, name):
-    
     outfile = f"{outdir}/{name}.fastq"
-    
     command = [
         "bbnorm.sh",
         f"-Xmx{memory}",
@@ -214,7 +205,6 @@ def normalise_reads(infile, outdir, name):
         logfile("Normalise", f"{name}: failed", logs)
 
 def PE_assembly(infile_1, infile_2, outdir, name):
-
     command = [
         "spades.py",
         "-t", f"{threads}",
@@ -234,9 +224,7 @@ def PE_assembly(infile_1, infile_2, outdir, name):
         logfile("Assembly", f"{name}: failed", logs)
 
 def format_genome(infile, outdir, name, filter=False):
-    
     outfile = f"{outdir}/{name}.fasta"
-
     if filter:
         command = [
             "reformat.sh",
@@ -261,9 +249,7 @@ def format_genome(infile, outdir, name, filter=False):
         logfile(note, f"{name}: failed", logs)
 
 def checkv(infile, outdir, name):
-    
     outfile = f"{outdir}/{name}"
-    
     command = [
         "checkv", "end_to_end",
         f"{infile}",
@@ -302,7 +288,6 @@ def find_hq_genomes(checkv, name):
 def extract_genome(contigs, header, outdir, name):
     outfile = f"{outdir}/{name}_{header}.fasta"
     phage = f"{name}_{header}"
-        
     handle = open(contigs)
     textfile = open(outfile, 'w')
     entries = list(SimpleFastaParser(handle)) 
@@ -313,9 +298,7 @@ def extract_genome(contigs, header, outdir, name):
             return outfile
 
 def coverage_calculation(genome, reads, outdir, name):
-
     cov_out = f"{outdir}/{name}.tsv"
-    
     command = [
         "bbmap.sh", 
         f"-Xmx{memory}",
@@ -330,7 +313,6 @@ def coverage_calculation(genome, reads, outdir, name):
         logfile("Coverage", f"{name}: failed", logs)
     
 def fastqc(reads, outdir):
-    
     command = [
         "fastqc",
         f"{reads}",
