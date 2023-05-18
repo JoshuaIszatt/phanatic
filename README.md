@@ -7,6 +7,7 @@ This python script (phanatic.py) will run a docker container to assemble genomes
 ## Associated publications:
 1. [Genome Sequences of Two Lytic Staphylococcus aureus Bacteriophages Isolated from Wastewater](https://journals.asm.org/doi/10.1128/mra.00954-22)
 2. [Genome Sequence of a Lytic Staphylococcus aureus Bacteriophage Isolated from Breast Milk](https://journals.asm.org/doi/10.1128/mra.00953-22)
+3. [Complete Genome Sequences of Four Pseudomonas aeruginosa Bacteriophages: Kara-mokiny 8, Kara-mokiny 13, Kara-mokiny 16, and Boorn-mokiny 1](https://journals.asm.org/doi/10.1128/mra.00960-22)
 
 ## FUNCTIONS
 The main functions of phanatic are:
@@ -16,15 +17,7 @@ The main functions of phanatic are:
 * CSV file with details of the assembly for each 
 
 ## Citation:
-If you use this software please cite one  or both of the following:
-Please also look at the third party software to cite the correct versions of software utilised by this container.
-
-Citation
-```
-Joshua J. Iszatt et al. “Genome Sequences of Two Lytic Staphylococcus aureus Bacteriophages Isolated from Wastewater”. In: Microbiology Resource Announcements 11.12 (Nov. 2022), e00954–22. doi: 10.1128/mra.00954-22. url: https://journals.asm.org/doi/10.1128/mra.00954-22 (visited on 04/26/2023).
-```
-
-Open source data citation
+If you use this software please cite the source code as below and look at the third party software to cite the correct versions of software utilised by this container.
 ```
 Iszatt J.(2023).Phanatic(v2.2.0)[Source code].Github:https://github.com/JoshuaIszatt/Phanatic
 ```
