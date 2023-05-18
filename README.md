@@ -52,3 +52,49 @@ https://hub.docker.com/r/iszatt
 
 ## License
 [GNU AGPLv3](https://github.com/JoshuaIszatt/phanatic/blob/master/LICENSE.md)
+
+## Config file
+This is the default config file, copy this and specify its location to use your own with adjustments.
+```
+[phanatic]
+image = iszatt/phanatic:2.2.0
+author = 'Joshua J Iszatt'
+citation = 'pending'
+
+[pipeline]
+normalise = True
+filter = True
+fastqc = True
+barcode = True
+clean_up = False
+
+[system]
+RAM = 24000m
+
+[input]
+r1_ext = _R1.fastq.gz
+r2_ext = _R2.fastq.gz
+
+[trim]
+read_length = 150
+trim_length = 12
+minimum_length = 100
+
+[merge]
+minimum_insert = 120
+minimum_overlap = 20
+
+[normalise]
+target_coverage = 250
+
+[SPAdes]
+memory_gb = 24
+threads = 24
+
+[filter]
+filter_length = 4000
+
+[barcoding]
+prefix = phanatic
+barcode_length = 5
+```
