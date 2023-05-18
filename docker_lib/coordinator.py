@@ -157,7 +157,7 @@ for pair in pairs:
     
     # Sample finish
     ji.logfile("Sample run complete", pair.name, logs)
-    
+
 # Barcoding
 if enable_barcodes:
     ji.logfile("Barcoding", "-----", logs)

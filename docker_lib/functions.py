@@ -314,7 +314,7 @@ def extract_genome(contigs, header, outdir, name):
 
 def coverage_calculation(genome, reads, outdir, name):
     
-    cov_out = f"{outdir}/{name}"
+    cov_out = f"{outdir}/{name}.tsv"
     
     command = [
         "bbmap.sh", 
