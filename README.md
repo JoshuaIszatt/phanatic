@@ -46,7 +46,7 @@ phanatic.py -h
 | biopython | 1.78 | A set of tools written in python for biological computation | https://biopython.org/ |
 | checkv | 1.0.1 | CheckV quality and completeness analysis for viral genomes | https://doi.org/10.1038/s41587-020-00774-7 |
 | checkv-db | 1.5 | Database version in this container | https://doi.org/10.1038/s41587-020-00774-7 |
-| fastqc | 0.11.9 | Quality control for reads | -------- |
+| fastqc | 0.11.9 | Quality control for reads | https://www.bioinformatics.babraham.ac.uk/projects/fastqc/ |
 
 ## Docker tags
 https://hub.docker.com/r/iszatt
