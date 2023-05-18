@@ -54,7 +54,7 @@ https://hub.docker.com/r/iszatt
 [GNU AGPLv3](https://github.com/JoshuaIszatt/phanatic/blob/master/LICENSE.md)
 
 ## Config file
-This is the default config file, copy this and specify its location to use your own with adjustments.
+This is the default config file, copy this and specify its location using '-c' to use your own with adjustments.
 ```
 [phanatic]
 image = iszatt/phanatic:2.2.0
