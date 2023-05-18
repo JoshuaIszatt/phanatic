@@ -313,7 +313,7 @@ def extract_genome(contigs, header, outdir, name):
             return outfile
 
 def coverage_calculation(genome, reads, outdir, name):
-    
+
     cov_out = f"{outdir}/{name}.tsv"
     
     command = [
@@ -347,4 +347,3 @@ def barcode_phage(original, tag, outdir):
     new = os.path.join(outdir, tag)
     os.system(f"cp {original} {new}")
     logfile("BARCODE", f"{original_name}:{tag}", logs)
-

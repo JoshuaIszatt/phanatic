@@ -47,6 +47,7 @@ parser.add_argument('-o', '--output', type=valid_dir, help='Direct output to thi
 parser.add_argument('-r', '--reads', type=str, choices=['PE_illumina_150'], default='PE_illumina_150', help='Pipeline options')
 parser.add_argument('-c', '--config', type=valid_file, help='Use config file to customise assembly')
 parser.add_argument('-v', '--version', action="store_true", help='Print the docker image version')
+parser.add_argument('--show_console', action="store_true", help='Include this flag to write output to console')
 parser.add_argument('--manual', action="store_true", help='Enter container interactively')
 args = parser.parse_args()
 
