@@ -39,12 +39,11 @@ Run the help command to see options
 ## Third-party software
 | Software | Version | Description | Please cite |
 | -------- | -------- | -------- | -------- |
-| SPAdes | 3.15.4 | -------- | -------- |
-| bbmap | 38.18 | -------- | -------- |
-| samtools | 1.6 | -------- | -------- |
-| biopython | 1.78 | -------- | -------- |
-| checkv | 1.0.1 | -------- | -------- |
-| checkv-db | 1.5 | -------- | -------- |
+| SPAdes | 3.15.4 | The St.Petersburg genome assembler containing various pipelines released under GPLv2 | https://doi.org/10.1002/cpbi.102 |
+| bbmap | 38.18 | U.S Department of Energy (DOE) Joint Genome Institute (JGI) toolset containing a set of fast bioinformatic tools for DNA/RNA sequencing data | https://sourceforge.net/projects/bbmap/ |
+| biopython | 1.78 | A set of tools written in python for biological computation | https://biopython.org/ |
+| checkv | 1.0.1 | CheckV quality and completeness analysis for viral genomes | https://doi.org/10.1038/s41587-020-00774-7 |
+| checkv-db | 1.5 | Database version in this container | https://doi.org/10.1038/s41587-020-00774-7 |
 | fastqc | 0.11.9 | Quality control for reads | -------- |
 
 ## Docker tags
