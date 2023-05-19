@@ -12,9 +12,10 @@ This python script (phanatic.py) will run a docker container to assemble genomes
 ## FUNCTIONS
 The main functions of phanatic are:
 * De novo assembly for phages
-* Quality checks run using qualimap
-* Extraction of 'Complete' and 'High-quality' contigs determined by CheckV
-* CSV file with details of the assembly for each 
+* Reads quality checks run using fastqc
+* Assembly quality and completeness check using CheckV
+* Extraction of 'Complete' and 'High-quality' contigs (determined via assembly QC)
+* Log file with each sample process detailed (phanatic_log.tsv)
 
 ## Citation:
 If you use this software please cite the source code as below and look at the third party software to cite the correct versions of software utilised by this container.
