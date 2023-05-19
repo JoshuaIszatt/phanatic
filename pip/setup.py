@@ -2,7 +2,7 @@ from setuptools import find_packages, setup
 
 setup(
     name="Phanatic",
-    version="2.2.0",
+    version="2.2.1",
     description="Python package to run de novo bacteriophage assembly container.",
     url="https://github.com/JoshuaIszatt/Phanatic",
     author="Joshua Iszatt",
