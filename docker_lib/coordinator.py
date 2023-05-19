@@ -97,6 +97,9 @@ for pair in pairs:
         continue
     
     # CheckV
+    if os.path.getsize(filtered) == 0:
+        continue
+    
     if ji.check_filepath(filtered):
         checkv = ji.checkv(filtered, checkv_dir, pair.name)
     else:
