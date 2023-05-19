@@ -28,7 +28,7 @@ To run this pipeline you first need a working docker installation.
 
 Install using pip
 ```sh
-pip install Phanatic==2.2.0
+pip install Phanatic==2.2.1
 ```
 
 Run the help command to see options 
@@ -59,7 +59,7 @@ https://hub.docker.com/r/iszatt
 This is the default config file, copy this and specify its location using '-c' to use your own with adjustments.
 ```
 [phanatic]
-image = iszatt/phanatic:2.2.0
+image = iszatt/phanatic:2.2.1
 author = 'Joshua J Iszatt'
 citation = 'pending'
 
