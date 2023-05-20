@@ -87,7 +87,11 @@ for pair in pairs:
         assembly = ji.PE_assembly(assemble_reads, unmerged, spades_dir, pair.name)
     else:
         continue
-        
+    
+    if os.path.getsize(assembly) == 0:
+        ji.logfile("ERROR: contigs file empty", f"{pair.name}: check SPAdes log", logs)
+        continue
+    
     if ji.check_filepath(assembly):
         if enable_filter:
             filtered = ji.format_genome(assembly, filtered_dir, pair.name, filter=True)
@@ -98,6 +102,7 @@ for pair in pairs:
     
     # CheckV
     if os.path.getsize(filtered) == 0:
+        ji.logfile("ERROR: Filtered contigs empty", f"{pair.name}: check contigs file", logs)
         continue
     
     if ji.check_filepath(filtered):

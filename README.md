@@ -1,4 +1,4 @@
-# Phanatic v2.2.1
+# Phanatic v2.2.2
 [![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)](https://pypi.org/project/PhageOrder/)
 [![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)](https://hub.docker.com/repository/docker/iszatt/phageorder/general)
 
@@ -28,7 +28,7 @@ To run this pipeline you first need a working docker installation.
 
 Install using pip
 ```sh
-pip install Phanatic==2.2.1
+pip install Phanatic==2.2.2
 ```
 
 Run the help command to see options 
@@ -59,7 +59,7 @@ https://hub.docker.com/r/iszatt
 This is the default config file, copy this and specify its location using '-c' to use your own with adjustments.
 ```
 [phanatic]
-image = iszatt/phanatic:2.2.1
+image = iszatt/phanatic:2.2.2
 author = 'Joshua J Iszatt'
 citation = 'pending'
 

@@ -205,6 +205,10 @@ def normalise_reads(infile, outdir, name):
         logfile("Normalise", f"{name}: failed", logs)
 
 def PE_assembly(infile_1, infile_2, outdir, name):
+    
+    if memory_gb < 24:
+        logfile("Warning", f"{memory_gb} GB is low memory for SPAdes", logs)
+    
     command = [
         "spades.py",
         "-t", f"{threads}",

@@ -37,7 +37,7 @@ def main():
         return file_path
 
     # Parsing arguments
-    image = 'iszatt/phanatic:2.2.1'
+    image = 'iszatt/phanatic:2.2.2'
     parser = argparse.ArgumentParser(description=f"Easy short read assembly. Joshua J Iszatt: https://github.com/JoshuaIszatt")
 
     # Input/output options
