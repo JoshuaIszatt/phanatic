@@ -1,4 +1,4 @@
-# Phanatic v2.2.2
+# Phanatic v2.2.3
 [![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)](https://pypi.org/project/PhageOrder/)
 [![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)](https://hub.docker.com/repository/docker/iszatt/phageorder/general)
 
@@ -18,9 +18,12 @@ The main functions of phanatic are:
 * Log file with each sample process detailed (phanatic_log.tsv)
 
 ## Citation:
-If you use this software please cite the source code as below and look at the third party software to cite the correct versions of software utilised by this container.
+If you use this software please cite one of the papers below and look at the third party software to cite the correct versions of software utilised by this container.
 ```
-Iszatt J.(2023).Phanatic(v2.2.0)[Source code].Github:https://github.com/JoshuaIszatt/Phanatic
+https://journals.asm.org/doi/10.1128/mra.00954-22
+```
+```
+https://journals.asm.org/doi/10.1128/mra.00953-22
 ```
 
 ## Installation
@@ -28,7 +31,7 @@ To run this pipeline you first need a working docker installation.
 
 Install using pip
 ```sh
-pip install Phanatic==2.2.2
+pip install Phanatic==2.2.3
 ```
 
 Run the help command to see options 
@@ -59,7 +62,7 @@ https://hub.docker.com/r/iszatt
 This is the default config file, copy this and specify its location using '-c' to use your own with adjustments.
 ```
 [phanatic]
-image = iszatt/phanatic:2.2.2
+image = iszatt/phanatic:2.2.3
 author = 'Joshua J Iszatt'
 citation = 'pending'
 

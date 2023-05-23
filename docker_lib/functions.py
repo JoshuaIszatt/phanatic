@@ -54,8 +54,6 @@ class Pair(object):
         self.read_1 = read_1;
         self.read_2 = read_2;
         
-        
-
 ###_______________________________________________________________________________________
 
 
@@ -331,5 +329,5 @@ def fastqc(reads, outdir):
 def barcode_phage(original, tag, outdir):
     original_name = os.path.basename(original)
     new = os.path.join(outdir, tag)
-    os.system(f"cp {original} {new}")
+    os.system(f"cp {original} {new}.fasta")
     logfile("BARCODE", f"{original_name}:{tag}", logs)
