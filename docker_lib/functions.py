@@ -329,5 +329,5 @@ def fastqc(reads, outdir):
 def barcode_phage(original, tag, outdir):
     original_name = os.path.basename(original)
     new = os.path.join(outdir, tag)
-    os.system(f"cp {original} {new}.fasta")
+    os.system(f"cp {original} {new}")
     logfile("BARCODE", f"{original_name}:{tag}", logs)

@@ -170,11 +170,18 @@ if enable_barcodes:
     ji.logfile("Barcoding", "-----", logs)
     os.makedirs(barcode_dir)
     tags = []
+    
+    # Tagging
     for file in os.listdir(format_dir):
-        filepath = os.path.join(format_dir, genome)
+        filepath = os.path.join(format_dir, file)
         new_tag = ji.generate_unique_tag(tags)
         tags.append(new_tag)
         ji.barcode_phage(filepath, new_tag, barcode_dir)
+    
+    # Formatting
+    for file in os.listdir(barcode_dir):
+        filepath = os.path.join(barcode_dir, file)
+        genome = ji.format_genome(filepath, barcode_dir, file)
 
 # Cleaning up
 if enable_clean:

@@ -1,0 +1,10 @@
+LICENSE.md
+setup.py
+Phanatic/__init__.py
+Phanatic/main.py
+Phanatic.egg-info/PKG-INFO
+Phanatic.egg-info/SOURCES.txt
+Phanatic.egg-info/dependency_links.txt
+Phanatic.egg-info/entry_points.txt
+Phanatic.egg-info/requires.txt
+Phanatic.egg-info/top_level.txt
