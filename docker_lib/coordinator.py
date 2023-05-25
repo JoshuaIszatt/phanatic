@@ -182,6 +182,9 @@ if enable_barcodes:
     for file in os.listdir(barcode_dir):
         filepath = os.path.join(barcode_dir, file)
         genome = ji.format_genome(filepath, barcode_dir, file)
+        
+        if os.path.exists(genome):
+            os.system(f"rm {filepath}")
 
 # Cleaning up
 if enable_clean:
