@@ -39,8 +39,11 @@ Run the help command to see options
 phanatic.py -h
 ```
 
-## Output
-* The assembled genome
+## Outputs
+* Assembled genome
+* CheckV analysis files
+* SPAdes assembly files
+* Reads QC files (fastqc)
 
 ## Third-party software
 | Software | Version | Description | Please cite |
