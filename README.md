@@ -39,6 +39,11 @@ Run the help command to see options
 phanatic.py -h
 ```
 
+Run a basic assembly with default configuration
+```sh
+phanatic.py -i <PATH TO READS DIR> -o <PATH TO OUTPUT DIR>
+```
+
 ## Outputs
 * Assembled genome
 * CheckV analysis files
