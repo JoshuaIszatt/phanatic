@@ -130,13 +130,20 @@ for pair in pairs:
     headers = complete+hq
     ji.logfile("Expected genomes", f"{pair.name}: {len(headers)}", logs)
     
+    # Making contamination file
+    contam_file = os.path.join(output, 'contamination.csv')
+    ji.create_csv(contam_file, "sample,genomes,status")
+    
     if len(headers) == 0:
         ji.logfile("Sample failed", pair.name, logs)
+        ji.append_csv(contam_file, f"{pair.name},{len(headers)},assembly failure")
         continue
     elif len(headers) == 1:
         ji.logfile("Clean sample", pair.name, logs)
+        ji.append_csv(contam_file, f"{pair.name},{len(headers)},clean")
     elif len(headers) > 1:
         ji.logfile("Contamination detected", pair.name, logs)
+        ji.append_csv(contam_file, f"{pair.name},{len(headers)},potential contamination")
     
     if not os.path.exists(extraction_dir):
         os.makedirs(extraction_dir)
