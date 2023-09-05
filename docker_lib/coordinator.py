@@ -60,19 +60,22 @@ if enable_qc:
 # Phanatic run 
 for pair in pairs:
     
-    # Reads processing:
+    # Trimming reads
     trim = ji.PE_trim(pair, trim_dir)
     
+    # Removing duplicates
     if ji.check_filepath(trim):
         deduped = ji.remove_duplicate_reads(trim, dedupe_dir, pair.name)
     else:
         continue
-        
+    
+    # Merging reads
     if ji.check_filepath(deduped):
         merged, unmerged = ji.merge_reads(deduped, merged_dir, pair.name)
     else:
         continue
 
+    # Normalising reads
     if enable_normalise:
         if ji.check_filepath(merged):
             normalised = ji.normalise_reads(merged, norm_dir, pair.name)
@@ -130,6 +133,8 @@ for pair in pairs:
     if len(headers) == 0:
         ji.logfile("Sample failed", pair.name, logs)
         continue
+    elif len(headers) > 1:
+        ji.logfile("Contamination detected", pair.name, logs)
     
     if not os.path.exists(extraction_dir):
         os.makedirs(extraction_dir)
@@ -177,7 +182,12 @@ if enable_barcodes:
         new_tag = ji.generate_unique_tag(tags)
         tags.append(new_tag)
         ji.barcode_phage(filepath, new_tag, barcode_dir)
-    
+        
+        # Producing index file
+        index = os.path.join(output, 'index.csv')
+        ji.create_csv(index, "sample_name,phage_ID")
+        ji.append_csv(index, f"{file},{new_tag}.fasta")
+        
     # Formatting
     for file in os.listdir(barcode_dir):
         filepath = os.path.join(barcode_dir, file)

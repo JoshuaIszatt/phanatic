@@ -91,15 +91,13 @@ def generate_unique_tag(existing_tags):
             logfile("Barcoding", f"Tag gen: {tag}", logs)
             return tag
 
-def create_csv(filename, data):
+def create_csv(filename, headers):
     with open(filename, 'w', newline='') as csvfile:
-        writer = csv.writer(csvfile)
-        writer.writerows(data)
+        csvfile.write(headers+'\n')
 
 def append_csv(filename, data):
     with open(filename, 'a', newline='') as csvfile:
-        writer = csv.writer(csvfile)
-        writer.writerow(data)
+        csvfile.write(data+'\n')
 
 def find_read_pairs(input_dir):
     read_pairs = []
@@ -318,7 +316,8 @@ def fastqc(reads, outdir):
     command = [
         "fastqc",
         f"{reads}",
-        f"-o {outdir}"
+        "-o",
+        f"{outdir}"
     ]
     try:
         subprocess.run(command, check=True)
