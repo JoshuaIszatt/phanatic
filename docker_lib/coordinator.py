@@ -132,7 +132,8 @@ for pair in pairs:
     
     # Making contamination file
     contam_file = os.path.join(output, 'contamination.csv')
-    ji.create_csv(contam_file, "sample,genomes,status")
+    if not os.path.exists(contam_file):
+        ji.create_csv(contam_file, "sample,genomes,status")
     
     if len(headers) == 0:
         ji.logfile("Sample failed", pair.name, logs)
@@ -194,7 +195,8 @@ if enable_barcodes:
         
         # Producing index file
         index = os.path.join(output, 'index.csv')
-        ji.create_csv(index, "sample_name,phage_ID")
+        if not os.path.exists(index):
+            ji.create_csv(index, "sample_name,phage_ID")
         ji.append_csv(index, f"{file},{new_tag}.fasta")
         
     # Formatting
