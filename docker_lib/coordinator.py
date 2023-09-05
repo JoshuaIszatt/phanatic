@@ -133,6 +133,8 @@ for pair in pairs:
     if len(headers) == 0:
         ji.logfile("Sample failed", pair.name, logs)
         continue
+    elif len(headers) == 1:
+        ji.logfile("Clean sample", pair.name, logs)
     elif len(headers) > 1:
         ji.logfile("Contamination detected", pair.name, logs)
     
