@@ -13,7 +13,8 @@ def main():
         "I (J. Iszatt) made Phanatic to assemble S. aureus phage genomes as part of my PhD project.",
         "This is a short read assembler primarily designed for bacteriophage",
         "My favourite bacteriophage is a Silviavirus named Koomba-kaat_1",
-        "You can use your own config file to customise the assembly and functions"
+        "You can use your own config file to customise the assembly and functions",
+        "If you have host bacterial sequences you can create an index file to perform read mapping and re-assembly, this will be done after an initial assembly run"
     ]
     random_prompt = random.choice(prompts)
 
@@ -47,6 +48,7 @@ def main():
     parser.add_argument('-o', '--output', type=valid_dir, help='Direct output to this location')
     parser.add_argument('-r', '--reads', type=str, choices=['PE_illumina_150'], default='PE_illumina_150', help='Pipeline options')
     parser.add_argument('-c', '--config', type=valid_file, help='Use config file to customise assembly')
+    parser.add_argument('--host_mapping', type=valid_file, help='Use an index file to specify host bacterial genome')
     parser.add_argument('-v', '--version', action="store_true", help='Print the docker image version')
     parser.add_argument('--show_console', action="store_true", help='Include this flag to write output to console')
     parser.add_argument('--manual', action="store_true", help='Enter container interactively')
@@ -67,7 +69,7 @@ def main():
         sys.exit("No input directory specified\nRun --help to see options")
     else:
         sys.exit("No input or output directories specified\nRun --help to see options")
-        
+
 
     # Printing command variables
     print(
@@ -84,8 +86,13 @@ def main():
 
     # Copying config file to output dir
     if args.config:
-        print(f"Using {args.config} file \n")
+        print(f"Using {args.config} file for configuration \n")
         os.system(f"cp {args.config} {args.output}/config.ini")
+
+    # Copying index file for read mapping
+    if args.host_mapping:
+        print(f"Using {args.host_mapping} file for host read mapping \n")
+        os.system(f"cp {args.host_mapping} {args.output}/host_mapping.csv")
 
     if args.show_console:
         docker = "docker run"

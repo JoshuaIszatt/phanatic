@@ -14,7 +14,17 @@ else
     export CHECKVDB=/assemble/database/$(basename /assemble/database/che*)
 fi
 
+# Running coordinator
+echo "Running coordinator script"
 python /assemble/bin/coordinator.py
+chmod -R 777 /assemble/output/*
+
+# Activating map environment
+conda activate map
+
+# Running mapping file
+echo "Running mapping script"
+python /assemble/bin/host_mapping.py
 chmod -R 777 /assemble/output/*
 
 if (($SECONDS > 3600)); then

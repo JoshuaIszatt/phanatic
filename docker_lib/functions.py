@@ -330,3 +330,8 @@ def barcode_phage(original, tag, outdir):
     new = os.path.join(outdir, tag)
     os.system(f"cp {original} {new}")
     logfile("BARCODE", f"{original_name}:{tag}", logs)
+
+#########################################################
+
+
+

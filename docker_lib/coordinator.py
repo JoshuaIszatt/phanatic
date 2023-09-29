@@ -225,5 +225,5 @@ if enable_clean:
             continue
 
 # Phanatic finish
-ji.logfile("Phanatic finished", "-----", logs)
+ji.logfile("Phanatic base assembly finished", "-----", logs)
 os.system(f"chmod -R 777 {output}/*")

@@ -15,6 +15,7 @@ The main functions of phanatic are:
 * Reads quality checks run using fastqc
 * Assembly quality and completeness check using CheckV
 * Extraction of 'Complete' and 'High-quality' contigs (determined via assembly QC)
+* OPTIONAL: Read mapping to host strains to check assembly contamination, generalised transduction
 * Log file with each sample process detailed (phanatic_log.tsv)
 
 ## Citation:
@@ -50,7 +51,7 @@ phanatic.py -i <PATH TO READS DIR> -o <PATH TO OUTPUT DIR>
 * SPAdes assembly files
 * Reads QC files (fastqc)
 
-## Third-party software
+## Third-party software for base assembly
 | Software | Version | Description | Please cite |
 | -------- | -------- | -------- | -------- |
 | SPAdes | 3.15.4 | The St.Petersburg genome assembler containing various pipelines released under GPLv2 | https://doi.org/10.1002/cpbi.102 |
@@ -59,6 +60,12 @@ phanatic.py -i <PATH TO READS DIR> -o <PATH TO OUTPUT DIR>
 | checkv | 1.0.1 | CheckV quality and completeness analysis for viral genomes | https://doi.org/10.1038/s41587-020-00774-7 |
 | checkv-db | 1.5 | Database version in this container | https://doi.org/10.1038/s41587-020-00774-7 |
 | fastqc | 0.11.9 | Quality control for reads | https://www.bioinformatics.babraham.ac.uk/projects/fastqc/ |
+
+## Third-party software for read mapping (In addition to above assembly)
+| Software | Version | Description | Please cite |
+| -------- | -------- | -------- | -------- |
+| bwa | 0.7.17 | -------- | -------- |
+| samtools | 1.9 | -------- | -------- |
 
 ## Docker tags
 https://hub.docker.com/r/iszatt
