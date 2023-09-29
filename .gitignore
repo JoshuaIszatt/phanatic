@@ -1,2 +1,4 @@
 # Ignore 
 database/**
+test_input/**
+test_output/
