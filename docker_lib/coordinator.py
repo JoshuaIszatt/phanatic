@@ -211,7 +211,6 @@ if enable_barcodes:
 if enable_clean:
     ji.logfile("Cleaning raw data", "-----", logs)
     remove = [trim_dir, 
-              dedupe_dir, 
               merged_dir, 
               norm_dir, 
               spades_dir, 
