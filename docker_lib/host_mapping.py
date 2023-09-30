@@ -50,18 +50,24 @@ def logfile(function, text, logfile):
 def mapping(genome, reads, outdir):
     
     # Creating temp file and moving directories
-    temp = os.path.join(outdir, "temp")
-    os.makedirs(temp)
-    os.system(f"cp {genome} {temp}")
+    os.makedirs(outdir)
+    os.system(f"cp {genome} {outdir}")
     
     # Reusing genome variable
-    genome = os.path.join(temp, os.path.basename(genome)) 
+    genome = os.path.join(outdir, os.path.basename(genome)) 
     
     # Indexing and alignment
-    aligned = os.path.join(temp, "aligned.sam")
+    aligned_sam = os.path.join(outdir, "aligned.sam")
     os.system(f"bwa index {genome}")
-    os.system(f"bwa mem {genome} {reads} > {aligned}")
-
+    os.system(f"bwa mem {genome} {reads} > {aligned_sam}")
+    
+    # Sorting sam file 
+    aligned_bam = os.path.join(outdir, "aligned.bam")
+    sorted = os.path.join(outdir, "sorted.bam")
+    outfile = os.path.join(outdir, "results.txt")
+    os.system(f"samtools view -bS {aligned_sam} > {aligned_bam} -t 24")
+    os.system(f"samtools sort {aligned_bam} > {sorted} -t 24")
+    os.system(f"samtools flagstat {sorted} > {outfile}")
 
 ################################################################################
 #_______________________________________________________________________________
@@ -124,13 +130,25 @@ for index, row in df.iterrows():
         logfile("Successful host pairing", f"{row['host']} to {name}", logs)
 
     # Mapping reads to host 
+    outdir = os.path.join(output, "host_read_mapping", row['host'].replace(".fasta", ""))
+    mapping(host, qc, outdir)
+    logfile("Host mapping complete", host, logs)
+
+    # Obtaining list of phages
+    phages = []
+    format_dir = os.path.join(output, "format_dir")
+    outdir = os.path.join(output, "phage_read_mapping")
+    
+    # Mapping reads to phage
+    for file in os.listdir(format_dir):
+        if name in file:
+            logfile(f"Mapping reads to phage", f"{qc} to {file}", logs)
+            mapping(file, qc, outdir)    
+    
+    # Assembling unmapped reads (To query any contigs >5000bp)
     
     
-    # Mapping reads to phage(s)
-    
-    
-    # Assembling unmapped reads
-    
+    # Creating mapped assembly (To check contig size against original)
     
 
 
