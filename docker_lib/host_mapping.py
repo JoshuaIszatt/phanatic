@@ -25,6 +25,8 @@ else:
 image = config["phanatic"]["image"]
 r1_ext = config["input"]["r1_ext"]
 r2_ext = config["input"]["r2_ext"]
+threads = int(config["SPAdes"]["threads"])
+
 
 # Phanatic settings
 try:
@@ -65,9 +67,23 @@ def mapping(genome, reads, outdir):
     aligned_bam = os.path.join(outdir, "aligned.bam")
     sorted = os.path.join(outdir, "sorted.bam")
     outfile = os.path.join(outdir, "results.txt")
-    os.system(f"samtools view -bS {aligned_sam} > {aligned_bam} -t 24")
-    os.system(f"samtools sort {aligned_bam} > {sorted} -t 24")
+    os.system(f"samtools view -bS {aligned_sam} > {aligned_bam} -t {threads}")
+    os.system(f"samtools sort {aligned_bam} > {sorted} -t {threads}")
     os.system(f"samtools flagstat {sorted} > {outfile}")
+    
+    # Creating reads dir
+    reads_dir = os.path.join(outdir, 'reads')
+    os.makedirs(reads_dir)
+    
+    # Separating mapped and unmapped reads
+    mapped = os.path.join(reads_dir, 'mapped.bam')
+    unmapped = os.path.join(reads_dir, 'unmapped.bam')
+    os.system(f"samtools view -F 4 -b {sorted} > {mapped} -t {threads}")
+    os.system(f"samtools view -f 4 -b {sorted} > {unmapped} -t {threads}")
+    
+    # Generating pileup file
+    pile = os.path.join(outdir, "pileup.txt")
+    os.system(f"samtools mpileup -f {genome} {sorted} > {pile}")
 
 ################################################################################
 #_______________________________________________________________________________
@@ -142,13 +158,14 @@ for index, row in df.iterrows():
     # Mapping reads to phage
     for file in os.listdir(format_dir):
         if name in file:
-            logfile(f"Mapping reads to phage", f"{qc} to {file}", logs)
-            mapping(file, qc, outdir)    
+            path = os.path.join(format_dir, file)
+            outdir = os.path.join(output, "phage_read_mapping", file)
+            logfile(f"Mapping reads to phage", f"{os.path.basename(qc)} to {file}", logs)
+            mapping(path, qc, outdir)
     
-    # Assembling unmapped reads (To query any contigs >5000bp)
-    
-    
-    # Creating mapped assembly (To check contig size against original)
+    # Version 2.2.5:
+    # Assembling unmapped phage reads (To query any contigs against inphared that may indicate prophage induction)
+    # Creating mapped assembly (To check contig size against original, indicating no interference from contaminating reads)
     
 
 
