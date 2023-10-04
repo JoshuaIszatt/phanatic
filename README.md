@@ -88,6 +88,10 @@ fastqc = True
 barcode = True
 clean_up = False
 
+[host_mapping_pipeline]
+mapped_assembly = True
+unmapped_assembly = True
+
 [system]
 RAM = 24000m
 

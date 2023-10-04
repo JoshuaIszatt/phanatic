@@ -19,16 +19,17 @@ echo "Running coordinator script"
 python /assemble/bin/coordinator.py
 chmod -R 777 /assemble/output/*
 
-# Activating map environment
-conda activate map
-
 # Running mapping file
+conda activate map
 echo "Running mapping script"
 python /assemble/bin/host_mapping.py
 chmod -R 777 /assemble/output/*
 
-# Version 2.2.5
 # Running re-assembly
+conda deactivate
+echo "Running final assembly script"
+python /assemble/bin/host_mapping.py
+chmod -R 777 /assemble/output/*
 
 
 if (($SECONDS > 3600)); then

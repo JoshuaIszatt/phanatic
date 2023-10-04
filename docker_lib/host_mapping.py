@@ -27,7 +27,6 @@ r1_ext = config["input"]["r1_ext"]
 r2_ext = config["input"]["r2_ext"]
 threads = int(config["SPAdes"]["threads"])
 
-
 # Phanatic settings
 try:
     enable_normalise = config.getboolean("pipeline", "normalise")
@@ -88,7 +87,7 @@ def mapping(genome, reads, outdir):
 ################################################################################
 #_______________________________________________________________________________
 
-# CLASSES
+# CLASSES (UNUSED)
 class Mapper(object):
     def __init__(self, host_genome, phage_genome, phage, qc_reads):
         self.host_genome = host_genome;
@@ -101,13 +100,13 @@ class Mapper(object):
 
 
 # Read mapping
-logfile("Phanatic mapping process", "collating bacterial hosts", logs)
+logfile("Phanatic host mapping", "collating bacterial hosts", logs)
 mapping_file = "/assemble/output/host_mapping.csv"
 if os.path.isfile(mapping_file):
     df = pd.read_csv(mapping_file)
     df.dropna(inplace=True)
 else:
-    logfile("Phanatic mapping process", "ERROR, mapping file not found", logs)
+    logfile("Phanatic host mapping", "ERROR, mapping file not found", logs)
     sys.exit("ERROR, mapping file not found")
 
 # Checking dataframe
@@ -146,7 +145,7 @@ for index, row in df.iterrows():
         logfile("Successful host pairing", f"{row['host']} to {name}", logs)
 
     # Mapping reads to host 
-    outdir = os.path.join(output, "host_read_mapping", row['host'].replace(".fasta", ""))
+    outdir = os.path.join(output, "host_read_mapping", (row['host'].replace(".fasta", "")+"_"+name))
     mapping(host, qc, outdir)
     logfile("Host mapping complete", host, logs)
 
@@ -160,14 +159,11 @@ for index, row in df.iterrows():
         if name in file:
             path = os.path.join(format_dir, file)
             outdir = os.path.join(output, "phage_read_mapping", file)
+            
+            # Mapping reads
             logfile(f"Mapping reads to phage", f"{os.path.basename(qc)} to {file}", logs)
             mapping(path, qc, outdir)
-    
-    # Version 2.2.5:
-    # Assembling unmapped phage reads (To query any contigs against inphared that may indicate prophage induction)
-    # Creating mapped assembly (To check contig size against original, indicating no interference from contaminating reads)
-    
+            
+            
 
-
-
-print("Its worked so far...")
+logfile(f"Finished host_mapping.py", "---------------------------------", logs)
