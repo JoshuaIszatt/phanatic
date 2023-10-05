@@ -49,7 +49,7 @@ filtered_dir = os.path.join(output, "filtered_contigs")
 checkv_dir = os.path.join(output, "checkv")
 extraction_dir = os.path.join(output, "genome_extractions")
 format_dir = os.path.join(output, "format_dir")
-coverage_dir = os.path.join(output, "coverage_dir")
+mapped = os.path.join(output, "mapped")
 barcode_dir = os.path.join(output, "barcode_phage")
 
 if enable_qc:
@@ -165,10 +165,18 @@ for pair in pairs:
         format_genome = ji.format_genome(genome, format_dir, name)
         formatted_genomes.append(format_genome)
 
-    # Coverage calculation
+    # Mapping reads
     for genome in formatted_genomes:
         name = os.path.basename(genome).replace(".fasta", "")
-        ji.coverage_calculation(genome, assemble_reads, coverage_dir, name)
+        
+        # Mapping QC reads
+        qc_mapped, qc_unmapped = ji.map_reads(genome, assemble_reads, mapped, "QCreads_"+name)
+        
+        # Mapping normalised reads
+        if enable_normalise:
+            normalised_mapped, normliased_unmapped = ji.map_reads(genome, assemble_reads, mapped, "Normalised_"+name)
+
+    # Re assembly
     
     # Quality checks
     if enable_qc:

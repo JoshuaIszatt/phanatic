@@ -297,20 +297,38 @@ def extract_genome(contigs, header, outdir, name):
             logfile("Genome extracted", phage, logs)
             return outfile
 
-def coverage_calculation(genome, reads, outdir, name):
-    cov_out = f"{outdir}/{name}.tsv"
+def map_reads(genome, reads, outdir, name):
+    
+    # Output dir
+    out = os.path.join(outdir, name)
+    os.makedirs(out)
+    
+    # Output files
+    covstats = os.path.join(out, "covstats.txt")
+    basecov = os.path.join(out, "basecov.txt")
+    scafstats = os.path.join(out, "scafstats.tsv")
+    mapped = os.path.join(out, "mapped.fastq.gz")
+    unmapped = os.path.join(out, "unmapped.fastq.gz")
+    
+    # Command    
     command = [
         "bbmap.sh", 
         f"-Xmx{memory}",
         f"ref={genome}",
         f"in={reads}",
-        f"covstats={cov_out}"
+        f"covstats={covstats}",
+        f"basecov={basecov}",
+        f"scafstats={scafstats}",
+        f"outm={mapped}",
+        f"outu={unmapped}"
     ]
     try:
         subprocess.run(command, check=True)
-        logfile("Coverage", f"{name}: success", logs)
+        logfile("Read mapping", f"{name}: success", logs)
     except subprocess.CalledProcessError:
-        logfile("Coverage", f"{name}: failed", logs)
+        logfile("Read mapping", f"{name}: failed", logs)
+    
+    return mapped, unmapped
     
 def fastqc(reads, outdir):
     command = [
