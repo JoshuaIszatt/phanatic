@@ -31,7 +31,8 @@ try:
     enable_filter = config.getboolean("pipeline", "filter")
     enable_qc = config.getboolean("pipeline", "fastqc")
     enable_barcodes = config.getboolean("pipeline", "barcode")
-    enable_clean = config.getboolean("pipeline", "clean_up")
+    enable_mapping = config.getboolean("pipeline", "mapping")
+    enable_reassembly = config.getboolean("pipeline", "re_assembly")
 except ValueError:
     sys.exit("Config file incorrectly set, pipeline values must be booleans")
 
@@ -42,20 +43,34 @@ print(f"Paired read files: {len(pairs)}")
 # Setting directories
 trim_dir = os.path.join(output, "trimmed")
 dedupe_dir = os.path.join(output, "deduped")
-merged_dir = os.path.join(output, "merged")
 norm_dir = os.path.join(output, "normalised")
-spades_dir = os.path.join(output, "initial_spades")
+spades_dir = os.path.join(output, "initial_assembly")
 filtered_dir = os.path.join(output, "filtered_contigs")
 checkv_dir = os.path.join(output, "checkv")
 extraction_dir = os.path.join(output, "genome_extractions")
 format_dir = os.path.join(output, "format_dir")
-mapped = os.path.join(output, "mapped")
 barcode_dir = os.path.join(output, "barcode_phage")
+
+if enable_mapping:
+    ji.logfile("pipeline options", "mapping enabled", logs)
+    mapped = os.path.join(output, "initial_read_mapping")
+    
+if enable_reassembly:
+    ji.logfile("pipeline options", "mapped reassembly enabled", logs)
+    mapped_assembly = os.path.join(output, "phage_reassembly")
 
 if enable_qc:
     ji.logfile("pipeline options", "QC enabled", logs)
     qc_dir = os.path.join(output, "reads_quality")
     os.makedirs(qc_dir)
+
+# Host mapping file
+enable_host_mapping = False
+host_mapping_file = "/assemble/output/host_mapping.csv"
+if os.path.exists(host_mapping_file):
+    ji.logfile("pipeline options", "host mapping enabled", logs)
+    host_mapping_dir = os.path.join(output, "barcode_phage")
+    enable_host_mapping = True
 
 # Phanatic run 
 for pair in pairs:
@@ -68,33 +83,27 @@ for pair in pairs:
         deduped = ji.remove_duplicate_reads(trim, dedupe_dir, pair.name)
     else:
         continue
-    
-    # Merging reads
-    if ji.check_filepath(deduped):
-        merged, unmerged = ji.merge_reads(deduped, merged_dir, pair.name)
-    else:
-        continue
 
     # Normalising reads
-    if enable_normalise:
-        if ji.check_filepath(merged):
-            normalised = ji.normalise_reads(merged, norm_dir, pair.name)
+    if ji.check_filepath(deduped):
+        if enable_normalise:
+            normalised = ji.normalise_reads(deduped, norm_dir, pair.name)
+            assemble_reads = normalised
         else:
-            continue
-        assemble_reads = normalised
-    else:
-        assemble_reads = merged
-    
+            assemble_reads = deduped
+
     # Assembly
     if ji.check_filepath(assemble_reads):
-        assembly = ji.PE_assembly(assemble_reads, unmerged, spades_dir, pair.name)
+        assembly = ji.PE_assembly(assemble_reads, spades_dir, pair.name)
     else:
         continue
     
+    # Checking for empty assembly
     if os.path.getsize(assembly) == 0:
         ji.logfile("ERROR: contigs file empty", f"{pair.name}: check SPAdes log", logs)
         continue
     
+    # Filtering assembly
     if ji.check_filepath(assembly):
         if enable_filter:
             filtered = ji.format_genome(assembly, filtered_dir, pair.name, filter=True)
@@ -112,6 +121,11 @@ for pair in pairs:
         checkv = ji.checkv(filtered, checkv_dir, pair.name)
     else:
         continue
+    
+    # Mapping reads phage contigs
+    if enable_mapping:
+        ji.logfile("Initial read mapping", f"{pair.name}", logs)
+        ji.map_reads(filtered, deduped, mapped, pair.name)
 
     # Extractions
     complete_genomes = os.path.join(checkv, "complete_genomes.tsv")
@@ -159,31 +173,32 @@ for pair in pairs:
 
     ji.logfile("Genomes extracted", f"{pair.name}: {len(genomes)}", logs)
 
+    # Looping through checkv genomes
     formatted_genomes = []
     for genome in genomes:
         name = os.path.basename(genome).replace(".fasta", "")
         format_genome = ji.format_genome(genome, format_dir, name)
         formatted_genomes.append(format_genome)
 
-    # Mapping reads
-    for genome in formatted_genomes:
-        name = os.path.basename(genome).replace(".fasta", "")
-        
-        # Mapping QC reads
-        qc_mapped, qc_unmapped = ji.map_reads(genome, assemble_reads, mapped, "QCreads_"+name)
-        
-        # Mapping normalised reads
-        if enable_normalise:
-            normalised_mapped, normliased_unmapped = ji.map_reads(genome, assemble_reads, mapped, "Normalised_"+name)
-
-    # Re assembly
+        # Separating reads for reassembly process
+        if enable_reassembly:
+            qc_map, qc_unmap, outdir = ji.separate_reads(genome, deduped, mapped_assembly, name)
+            if not os.path.getsize(qc_map) == 0:
+                mapped_contigs = ji.PE_assembly(qc_map, outdir, "spades")
+            if not os.path.getsize(qc_unmap) == 0:
+                unmapped_contigs = ji.PE_assembly(qc_unmap, outdir, "spades")    
+    
+    # Mapping QC reads to host contig (For contamination check) 
+    if enable_host_mapping:
+        pass
+    
+        # Mapping phage_mapped reads to host contigs (For target phage transduction check)
+    
+    
     
     # Quality checks
     if enable_qc:
-        if enable_normalise:
-            ji.fastqc(normalised, qc_dir)
-        else:
-            ji.fastqc(merged, qc_dir)  
+        ji.fastqc(assemble_reads, qc_dir) 
     
     # Sample finish
     ji.logfile("Sample run complete", pair.name, logs)
@@ -214,22 +229,6 @@ if enable_barcodes:
         
         if os.path.exists(genome):
             os.system(f"rm {filepath}")
-
-# Cleaning up
-if enable_clean:
-    ji.logfile("Cleaning raw data", "-----", logs)
-    remove = [trim_dir, 
-              merged_dir, 
-              norm_dir, 
-              spades_dir, 
-              filtered_dir,
-              extraction_dir
-              ]
-    for data in remove:
-        try:
-            os.system(f"rm -rf {data}")
-        except:
-            continue
 
 # Phanatic finish
 ji.logfile("Phanatic base assembly finished", "-----", logs)

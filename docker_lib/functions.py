@@ -30,6 +30,7 @@ r2_ext = config["input"]["r2_ext"]
 read_length = int(config["trim"]["read_length"])
 trim_length = int(config["trim"]["trim_length"])
 minimum_length = config["trim"]["minimum_length"]
+q_trim = config["trim"]["read_quality"]
 
 minimum_insert = int(config["merge"]["minimum_insert"])
 minimum_overlap = int(config["merge"]["minimum_overlap"])
@@ -134,8 +135,7 @@ def PE_trim(read_pair, outdir):
         f"out={outfile}",
         f"ftl={tl}",
         f"ftr={tr}",
-        "qhdist=1",
-        "qtrim=10",
+        f"minavgquality={q_trim}",
         f"minlength={minimum_length}"
     ]
     try:
@@ -200,7 +200,7 @@ def normalise_reads(infile, outdir, name):
     except subprocess.CalledProcessError:
         logfile("Normalise", f"{name}: failed", logs)
 
-def PE_assembly(infile_1, infile_2, outdir, name):
+def PE_assembly(reads, outdir, name):
     
     if memory_gb < 24:
         logfile("Warning", f"{memory_gb} GB is low memory for SPAdes", logs)
@@ -213,8 +213,7 @@ def PE_assembly(infile_1, infile_2, outdir, name):
         "--careful",
         "-k", "55,77,99,127",
         "-o", f"{outdir}/{name}",
-        "--merged", f"{infile_1}",
-        "-s", f"{infile_2}"
+        "--12", f"{reads}"
     ]
     try:
         subprocess.run(command, check=True)
@@ -318,18 +317,41 @@ def map_reads(genome, reads, outdir, name):
         f"in={reads}",
         f"covstats={covstats}",
         f"basecov={basecov}",
-        f"scafstats={scafstats}",
-        f"outm={mapped}",
-        f"outu={unmapped}"
+        f"scafstats={scafstats}"
     ]
     try:
         subprocess.run(command, check=True)
         logfile("Read mapping", f"{name}: success", logs)
     except subprocess.CalledProcessError:
         logfile("Read mapping", f"{name}: failed", logs)
+
+def separate_reads(genome, reads, outdir, name):
     
-    return mapped, unmapped
+    # Output dir
+    out = os.path.join(outdir, name)
+    os.makedirs(out)
     
+    # Output files
+    mapped = os.path.join(out, "mapped.fastq.gz")
+    unmapped = os.path.join(out, "unmapped.fastq.gz")
+    
+    # Command    
+    command = [
+        "bbmap.sh", 
+        f"-Xmx{memory}",
+        f"ref={genome}",
+        f"in={reads}",
+        f"outm={mapped}",
+        f"outu={unmapped}"
+    ]
+    try:
+        subprocess.run(command, check=True)
+        logfile("Read extraction", f"{name}: success", logs)
+    except subprocess.CalledProcessError:
+        logfile("Read extraction", f"{name}: failed", logs)
+    
+    return mapped, unmapped, out
+
 def fastqc(reads, outdir):
     command = [
         "fastqc",

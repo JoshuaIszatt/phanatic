@@ -29,10 +29,6 @@ RUN conda create --name assemble --file /assemble/build/assemble.txt \
     && conda init bash
 RUN echo "conda activate assemble" >> ~/.bashrc
 
-COPY ./map.txt /assemble/build
-RUN conda create --name map --file /assemble/build/map.txt \
-    && conda init bash
-
 # Adding scripts
 COPY ./docker_lib/* /assemble/bin/
 RUN echo 'export PATH="/assemble/bin:$PATH"' >> ~/.bashrc

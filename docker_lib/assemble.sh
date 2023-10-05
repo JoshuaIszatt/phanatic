@@ -19,19 +19,6 @@ echo "Running coordinator script"
 python /assemble/bin/coordinator.py
 chmod -R 777 /assemble/output/*
 
-# Running mapping file
-conda activate map
-echo "Running mapping script"
-python /assemble/bin/host_mapping.py
-chmod -R 777 /assemble/output/*
-
-# Running re-assembly
-conda deactivate
-echo "Running final assembly script"
-python /assemble/bin/host_mapping.py
-chmod -R 777 /assemble/output/*
-
-
 if (($SECONDS > 3600)); then
     let "hours=SECONDS/3600"
     let "minutes=(SECONDS%3600)/60"
