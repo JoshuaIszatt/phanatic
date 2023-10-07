@@ -53,11 +53,11 @@ barcode_dir = os.path.join(output, "barcode_phage")
 
 if enable_mapping:
     ji.logfile("pipeline options", "mapping enabled", logs)
-    mapped = os.path.join(output, "initial_read_mapping")
+    mapped = os.path.join(output, "mapping_QC_to_phage")
     
 if enable_reassembly:
     ji.logfile("pipeline options", "mapped reassembly enabled", logs)
-    mapped_assembly = os.path.join(output, "phage_reassembly")
+    mapped_assembly = os.path.join(output, "Reassembly_mapped_reads")
 
 if enable_qc:
     ji.logfile("pipeline options", "QC enabled", logs)
@@ -69,8 +69,8 @@ enable_host_mapping = False
 host_mapping_file = "/assemble/output/host_mapping.csv"
 if os.path.exists(host_mapping_file):
     ji.logfile("pipeline options", "host mapping enabled", logs)
-    host_mapping_dir = os.path.join(output, "host_mapping_contamination_check")
-    phage_host_mapping_dir = os.path.join(output, "host_mapping_transduction_check")
+    host_mapping_dir = os.path.join(output, "mapping_QC_to_host")
+    phage_host_mapping_dir = os.path.join(output, "mapping_phageQC_to_host")
     enable_host_mapping = True
 
 # Phanatic run 
@@ -174,6 +174,16 @@ for pair in pairs:
 
     ji.logfile("Genomes extracted", f"{pair.name}: {len(genomes)}", logs)
 
+    # Host mapping process
+    if enable_host_mapping:
+        
+        # Mapping QC reads to host genome (For contamination check and signs of transduction by % mapped reads)    
+        host = ji.host_csv_scan(host_mapping_file, pair.read_1, pair.read_2)
+        if host is not None:
+            bacteria_name = os.path.basename(host).replace(".fasta", "")
+            ji.logfile("Mapping QC reads to host", f"{pair.name} QC reads mapped to {bacteria_name}", logs)
+            ji.map_reads(host, deduped, host_mapping_dir, f"{pair.name}_{bacteria_name}")
+
     # Looping through checkv genomes
     formatted_genomes = []
     for genome in genomes:
@@ -181,47 +191,20 @@ for pair in pairs:
         format_genome = ji.format_genome(genome, format_dir, name)
         formatted_genomes.append(format_genome)
 
-        # Separating reads for reassembly process
+        # Separating reads for mapped reassembly process
         if enable_reassembly:
             qc_map, qc_unmap, outdir = ji.separate_reads(genome, deduped, mapped_assembly, name)
+            
+            # Assembling mapped and unmapped reads
             if not os.path.getsize(qc_map) == 0:
                 mapped_contigs = ji.PE_assembly(qc_map, outdir, "spades_mapped")
             if not os.path.getsize(qc_unmap) == 0:
                 unmapped_contigs = ji.PE_assembly(qc_unmap, outdir, "spades_unmapped")    
-    
-            # Host mapping process 
-            if enable_host_mapping:
-                
-                # Reading csv       
-                rows = []
-                with open(host_mapping_file, newline='') as file:
-                    reader = csv.reader(file, delimiter=',', quotechar='|')
-                    for row in reader:
-                        
-                        if row[0] == 'host':
-                            continue
-                        
-                        if not os.path.exists(os.path.join(input, row[0])):
-                            ji.logfile("Error", f"{row[0]} not found", logs)
-                            continue
-                        if not os.path.exists(os.path.join(input, row[1])):
-                            ji.logfile("Error", f"{row[1]} not found", logs)
-                            continue
-                        if not os.path.exists(os.path.join(input, row[2])):
-                            ji.logfile("Error", f"{row[2]} not found", logs)
-                            continue
-                    
-                        if pair.read_1 and pair.read_2 in row:
-                            ji.logfile("Host mapping", f"{pair.name} phages", logs)
-                            bacterial_genome = os.path.join(input, row[0])
-                            bacteria_name = row[0].replace('.fasta', '')
-                            
-                            # Mapping QC reads to host genome (For contamination check)
-                            if not os.path.exists(os.path.join(host_mapping_dir, bacteria_name)):
-                                ji.map_reads(bacterial_genome, deduped, host_mapping_dir, bacteria_name)
 
-                            # Mapping phage_mapped reads to host genome (For target phage transduction check)
-                            ji.map_reads(bacterial_genome, qc_map, phage_host_mapping_dir, name)
+            # Mapping QC phage_mapped reads to host genome (For transduction check of target phage, looking for regions >5000bp long)
+            ji.logfile(f"Mapping phage reads to host", f"{name} reads mapped to {bacteria_name}", logs)
+            ji.map_reads(host, qc_map, phage_host_mapping_dir, name)
+            
  
     # Quality checks
     if enable_qc:

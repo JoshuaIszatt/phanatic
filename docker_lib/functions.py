@@ -371,7 +371,30 @@ def barcode_phage(original, tag, outdir):
     os.system(f"cp {original} {new}")
     logfile("BARCODE", f"{original_name}:{tag}", logs)
 
-#########################################################
-
-
-
+def host_csv_scan(mapping_file, read_1, read_2):
+    rows = []
+    with open(mapping_file, newline='') as file:
+        reader = csv.reader(file, delimiter=',', quotechar='|')
+        for row in reader:
+            if row[0] == 'host':
+                continue
+            if not os.path.exists(os.path.join("/assemble/input", row[0])):
+                continue
+            if not os.path.exists(os.path.join("/assemble/input", row[1])):
+                continue
+            if not os.path.exists(os.path.join("/assemble/input", row[2])):
+                continue
+            if os.path.basename(read_1) and os.path.basename(read_2) in row:
+                rows.append(row)
+    
+    if len(rows) > 1:
+        logfile("ERROR", f"Duplicate host entries found", logs)
+        return None
+    elif len(rows) == 1:
+        logfile("Host Identified", f"{row[0]}", logs)
+        return os.path.join("/assemble/input", row[0])
+    elif len(rows) == 0:
+        logfile("No host identified", f"---", logs)
+        return None
+    else:
+        return None
