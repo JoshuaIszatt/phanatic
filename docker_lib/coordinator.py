@@ -57,7 +57,7 @@ if enable_mapping:
     
 if enable_reassembly:
     ji.logfile("pipeline options", "mapped reassembly enabled", logs)
-    mapped_assembly = os.path.join(output, "Reassembly_mapped_reads")
+    mapped_assembly = os.path.join(output, "mapping_reassembly")
 
 if enable_qc:
     ji.logfile("pipeline options", "QC enabled", logs)
@@ -202,8 +202,8 @@ for pair in pairs:
                 unmapped_contigs = ji.PE_assembly(qc_unmap, outdir, "spades_unmapped")    
 
             # Mapping QC phage_mapped reads to host genome (For transduction check of target phage, looking for regions >5000bp long)
-            ji.logfile(f"Mapping phage reads to host", f"{name} reads mapped to {bacteria_name}", logs)
-            ji.map_reads(host, qc_map, phage_host_mapping_dir, name)
+            #ji.logfile(f"Mapping phage reads to host", f"{name} reads mapped to {bacteria_name}", logs)
+            #ji.map_reads(host, qc_map, phage_host_mapping_dir, name)
             
  
     # Quality checks
