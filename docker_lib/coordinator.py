@@ -288,7 +288,7 @@ So what metrics do we need for this:
     
     
 THE AIM:
-    Finished. This final category represents a special instance in
+    Finished: This final category represents a special instance in
 which, in addition to having a completed consensus genome sequence, 
 there has been a population-level characterization of genomic diversity. 
 Typically this requires ~400 to 1,000 coverage (see below). This provides 
