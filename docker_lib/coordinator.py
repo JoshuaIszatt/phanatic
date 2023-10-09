@@ -243,3 +243,60 @@ if enable_barcodes:
 # Phanatic finish
 ji.logfile("Phanatic base assembly finished", "-----", logs)
 os.system(f"chmod -R 777 {output}/*")
+
+
+'''
+Host mapping genomes:
+
+    > Samples were considered free from contamination 
+    if the total assembly size was close to the range 
+    of genome sizes within that particular virus family 
+    and if less than 5% of reads mapped to host reference 
+    genomes.
+    
+    > The recommended category for viruses used in animal models for vaccine 
+    development, and by extension phage therapy, is “Finished”. 
+    Finished status is defined as a single consensus sequence 
+    representing 100% of the genome with all open reading frames 
+    (ORFs) identified and population diversity, or lack of population 
+    diversity as an indicator of purity, of the sequence 
+    verified via deep coverage.
+    
+    > Assemblies were considered validated if >90% of reads mapped back 
+    to the phage genome
+    
+    > Additionally, in order for genomes to proceed from this checkpoint, 
+    average whole genome coverage and lowest coverage were at least 
+    100x for complete genomes and ~400x or finished genomes
+    
+    > Finished viral genomes have a complete sequence plus a minimum of 
+    400-1000x coverage depth to resolve population-level variations
+    
+    - Philipson et al, (2018), Characterizing Phage Genomes for Therapeutic Applications
+    
+    
+    
+So what metrics do we need for this:
+
+    More than 90% reads mapping to phage contig scafstats.txt from QC to phage mapped
+    
+    Average whole genome coverage + lowest coverage for any base: 
+        = 100X for 'complete'
+        = 400X for 'finished'
+
+    Less than 5% reads mapping to host contig scafstats.txt from QC to host mapped (if available)
+    
+    
+THE AIM:
+    Finished. This final category represents a special instance in
+which, in addition to having a completed consensus genome sequence, 
+there has been a population-level characterization of genomic diversity. 
+Typically this requires ~400 to 1,000 coverage (see below). This provides 
+the most complete picture of a viral population; however, this 
+designation will apply only for a single stock. 
+
+Additional characterizations will be necessary for future
+passages
+
+- Ladner 2014 Standards for Sequencing Viral Genomes in the Era of HighThroughput Sequencing
+'''

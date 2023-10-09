@@ -303,8 +303,8 @@ def map_reads(genome, reads, outdir, name):
     os.makedirs(out)
     
     # Output files
-    covstats = os.path.join(out, "covstats.txt")
-    basecov = os.path.join(out, "basecov.txt")
+    covstats = os.path.join(out, "covstats.tsv")
+    basecov = os.path.join(out, "basecov.tsv")
     scafstats = os.path.join(out, "scafstats.tsv")
     mapped = os.path.join(out, "mapped.fastq.gz")
     unmapped = os.path.join(out, "unmapped.fastq.gz")

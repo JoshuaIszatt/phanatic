@@ -19,6 +19,11 @@ echo "Running coordinator script"
 python /assemble/bin/coordinator.py
 chmod -R 777 /assemble/output/*
 
+# Running image gen
+echo "Generating coverage graphs"
+conda deactivate
+python /assemble/bin/coverage_graph.py
+
 if (($SECONDS > 3600)); then
     let "hours=SECONDS/3600"
     let "minutes=(SECONDS%3600)/60"
