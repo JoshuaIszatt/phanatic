@@ -1,4 +1,4 @@
-# Phanatic v2.2.3
+# Phanatic v2.2.4
 [![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)](https://pypi.org/project/PhageOrder/)
 [![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)](https://hub.docker.com/repository/docker/iszatt/phageorder/general)
 
@@ -32,7 +32,7 @@ To run this pipeline you first need a working docker installation.
 
 Install using pip
 ```sh
-pip install Phanatic==2.2.3
+pip install Phanatic==2.2.4
 ```
 
 Run the help command to see options 
@@ -75,9 +75,9 @@ https://hub.docker.com/r/iszatt
 
 ## Config file
 This is the default config file, copy this and specify its location using '-c' to use your own with adjustments.
-```
+```ini
 [phanatic]
-image = iszatt/phanatic:2.2.3
+image = iszatt/phanatic:2.2.4
 author = 'Joshua J Iszatt'
 citation = 'pending'
 
@@ -85,12 +85,9 @@ citation = 'pending'
 normalise = True
 filter = True
 fastqc = True
-barcode = True
-clean_up = False
-
-[host_mapping_pipeline]
-mapped_assembly = True
-unmapped_assembly = True
+barcode = False
+mapping = True
+re_assembly = True
 
 [system]
 RAM = 24000m
@@ -103,6 +100,7 @@ r2_ext = _R2.fastq.gz
 read_length = 150
 trim_length = 12
 minimum_length = 100
+read_quality = 15
 
 [merge]
 minimum_insert = 120
@@ -116,9 +114,21 @@ memory_gb = 24
 threads = 24
 
 [filter]
-filter_length = 4000
+filter_length = 1000
 
 [barcoding]
-prefix = phanatic
+prefix = phage
 barcode_length = 5
+
 ```
+
+## Host mapping file
+An example csv formatted mapping file, notice that multiple sets of reads can be mapped to a single host genome.
+To use this: specify the path using the '--host_mapping' flag
+```
+host,read_1,read_2
+hostA_genome.fasta,ReadsA1_R1.fastq.gz,ReadsA1_R2.fastq.gz
+hostA_genome.fasta,ReadsA2_R1.fastq.gz,ReadsA2_R2.fastq.gz
+hostB_genome.fasta,ReadsB1_R1.fastq.gz,ReadsB1_R2.fastq.gz
+```
+

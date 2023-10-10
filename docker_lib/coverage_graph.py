@@ -94,21 +94,24 @@ def generate_coverage_graph(covstats, basecov, outdir):
 
 # Directories
 qc_phage = '/assemble/output/mapping_QC_to_phage'
+norm_phage = '/assemble/output/mapping_Norm_to_phage'
 qc_host = '/assemble/output/mapping_QC_to_host'
+dirs = [qc_phage, norm_phage, qc_host]
 
 # Running script
-if os.path.exists(qc_phage):
-    for file in os.listdir(qc_phage):
-        print(file)
-        # Setting function inputs
-        dirpath = os.path.join(qc_phage, file)
-        cov = os.path.join(dirpath, "covstats.tsv")
-        base = os.path.join(dirpath, "basecov.tsv")
+for directory in dirs:
+    if os.path.exists(directory):
+        for file in os.listdir(directory):
+            print(file)
+            # Setting function inputs
+            dirpath = os.path.join(directory, file)
+            cov = os.path.join(dirpath, "covstats.tsv")
+            base = os.path.join(dirpath, "basecov.tsv")
 
-        # Running graph
-        try:
-            generate_coverage_graph(cov, base, dirpath)
-        except Exception as e:
-            print(e)
-else:
-    print("error")
+            # Running graph
+            try:
+                generate_coverage_graph(cov, base, dirpath)
+            except Exception as e:
+                print(e)
+    else:
+        print("error")

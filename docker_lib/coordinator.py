@@ -54,7 +54,8 @@ barcode_dir = os.path.join(output, "barcode_phage")
 if enable_mapping:
     ji.logfile("pipeline options", "mapping enabled", logs)
     mapped = os.path.join(output, "mapping_QC_to_phage")
-    
+    mapped2 = os.path.join(output, "mapping_Norm_to_phage")
+
 if enable_reassembly:
     ji.logfile("pipeline options", "mapped reassembly enabled", logs)
     mapped_assembly = os.path.join(output, "mapping_reassembly")
@@ -125,8 +126,15 @@ for pair in pairs:
     
     # Mapping reads phage contigs
     if enable_mapping:
-        ji.logfile("Initial read mapping", f"{pair.name}", logs)
+        
+        # QC
+        ji.logfile("QC read mapping to phage contigs", f"{pair.name}", logs)
         ji.map_reads(filtered, deduped, mapped, pair.name)
+
+        # Normalised
+        if enable_normalise:
+            ji.logfile("Normalised / subsampled read mapping to phage contigs", f"{pair.name}", logs)
+            ji.map_reads(filtered, assemble_reads, mapped2, pair.name)
 
     # Extractions
     complete_genomes = os.path.join(checkv, "complete_genomes.tsv")
