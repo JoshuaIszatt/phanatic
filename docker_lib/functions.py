@@ -398,3 +398,35 @@ def host_csv_scan(mapping_file, read_1, read_2):
         return None
     else:
         return None
+
+def covstat_filter(header, covstat):
+    cov = None
+    cut = int(target_coverage * 0.8)
+    # Obtaining covstat
+    with open(covstat, newline='') as file:
+        reader = csv.reader(file, delimiter='\t', quotechar='|')
+        for row in reader:
+            if row[0] == header:
+                cov = float(row[1])
+                break
+    # Return value
+    if cov is None:
+        return None
+    
+    if cov:
+        return cov, cut
+        
+def scafstat_filter(header, scafstat):
+    perc_mapped = None
+    # Obtaining unambig % mapped reads
+    with open(scafstat, newline='') as file:
+        reader = csv.reader(file, delimiter='\t', quotechar='|')
+        for row in reader:
+            if row[0] == header:
+                perc_mapped = float(row[1])
+    # Return value
+    if perc_mapped is None:
+        return None
+    
+    if perc_mapped:
+        return perc_mapped, 90

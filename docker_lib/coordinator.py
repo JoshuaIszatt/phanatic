@@ -124,7 +124,7 @@ for pair in pairs:
     else:
         continue
     
-    # Mapping reads phage contigs
+    # Mapping reads to phage contigs
     if enable_mapping:
         
         # QC
@@ -135,11 +135,6 @@ for pair in pairs:
         if enable_normalise:
             ji.logfile("Normalised / subsampled read mapping to phage contigs", f"{pair.name}", logs)
             ji.map_reads(filtered, assemble_reads, mapped2, pair.name)
-
-    # Mapping filter! !!! 80% of target coverage
-    #
-    #
-    #
     
     # Extractions
     complete_genomes = os.path.join(checkv, "complete_genomes.tsv")
@@ -159,26 +154,72 @@ for pair in pairs:
     ji.logfile("Expected genomes", f"{pair.name}: {len(headers)}", logs)
     
     # Making summary file
-    contam_file = os.path.join(output, 'summary.csv')
-    if not os.path.exists(contam_file):
-        ji.create_csv(contam_file, "sample,genomes,status")
+    sample_file = os.path.join(output, 'sample_summary.csv')
+    if not os.path.exists(sample_file):
+        ji.create_csv(sample_file, "sample,genomes,status")
     
     if len(headers) == 0:
         ji.logfile("Sample failed", pair.name, logs)
-        ji.append_csv(contam_file, f"{pair.name},{len(headers)},failed")
+        ji.append_csv(sample_file, f"{pair.name},{len(headers)},failed")
         continue
     elif len(headers) == 1:
         ji.logfile("Clean sample", pair.name, logs)
-        ji.append_csv(contam_file, f"{pair.name},{len(headers)},clean")
+        ji.append_csv(sample_file, f"{pair.name},{len(headers)},clean")
     elif len(headers) > 1:
-        ji.logfile("Contamination detected", pair.name, logs)
-        ji.append_csv(contam_file, f"{pair.name},{len(headers)},contaminated")
+        ji.logfile("Potential contamination", pair.name, logs)
+        ji.append_csv(sample_file, f"{pair.name},{len(headers)},contaminated")
     
+    # Making extraction dir
     if not os.path.exists(extraction_dir):
         os.makedirs(extraction_dir)
 
+    # Looping through contigs
+    contig_file = os.path.join(output, 'contig_mapping_check.csv')
+    if not os.path.exists(contig_file):
+        ji.create_csv(contig_file, "sample,contig_name,avg_coverage,cov_status,phage_mapped_(%),mapped_status")
     genomes = []
     for header in headers:
+        
+        # Mapping filter: 80% of target coverage
+        ji.logfile("Coverage filtering", f"Scanning: {header}", logs)
+        covstat = os.path.join(mapped, pair.name, 'covstats.tsv')
+        scafstat = os.path.join(mapped, pair.name, 'scafstats.tsv')
+        
+        # Coverage filter
+        coverage, coverage_target = ji.covstat_filter(header, covstat)
+        perc_mapped, perc_target = ji.scafstat_filter(header, scafstat)
+        
+        if coverage is None:
+            ji.logfile("Coverage check failed", f"Check {header} coverage", logs)
+        if perc_mapped is None:
+            ji.logfile("Mapping percentage check failed", f"Check {header} QC mapping", logs)
+
+        # Logging file data
+        if coverage >= coverage_target:
+            cov_pass = "PASS"
+            ji.logfile("Coverage check PASSED", header, logs)
+        else:
+            cov_pass = "FAIL"
+            ji.logfile("Coverage check: FAILED", header, logs)
+
+        # Logging file data
+        if perc_mapped >= perc_target:
+            perc_pass = "PASS"
+            ji.logfile("Percentage mapping check PASSED", header, logs)
+        else:
+            perc_pass = "FAIL"
+            ji.logfile("Percentage mapping check: FAILED", header, logs)
+        
+        # Recording data
+        ji.append_csv(pair.name, contig_file, f"{header},{coverage},{cov_pass},{perc_mapped},{perc_pass}")
+        
+        # PASS / FAIL
+        if cov_pass == 'FAIL':
+            continue
+        elif perc_pass == 'FAIL':
+            continue
+        
+        # Genome extraction from filtered contigs
         extraction = ji.extract_genome(filtered, 
                                         header, 
                                         extraction_dir, 

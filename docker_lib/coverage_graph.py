@@ -116,4 +116,60 @@ for directory in dirs:
     else:
         print("error")
 
-# Analysing base coverage for > 5000bp segment in host mapped phage reads
+##############################################################################################
+
+# Need to make it so that sample IDs are added into the first column before the headers
+sys.exit()
+
+dfs = []
+for file in os.listdir(qc_phage):
+    path = os.path.join(qc_phage, file, 'scafstats.tsv')
+    df = pd.read_csv(path, sep='\t')
+    dfs.append(df)
+
+# Saving file
+map = pd.concat(dfs)
+map.sort_values(by='%unambiguousReads', inplace=True, ascending=False)
+
+# Concatenating all covstats files
+dfs = []
+for file in os.listdir(qc_phage):
+    path = os.path.join(qc_phage, file, 'covstats.tsv')
+    df = pd.read_csv(path, sep='\t')
+    dfs.append(df)
+
+# Saving file
+cov = pd.concat(dfs)
+cov.sort_values(by='Avg_fold', inplace=True, ascending=False)
+
+# Saving files
+map.to_csv('mapping_QC_stats_summary.tsv', sep='\t', index=False)
+cov.to_csv('coverage_QC_stats_summary.tsv', sep='\t', index=False)
+
+##############################################################################################
+
+# Concatenating all scafstats files  
+dfs = []
+for file in os.listdir(norm_phage):
+    path = os.path.join(norm_phage, file, 'scafstats.tsv')
+    df = pd.read_csv(path, sep='\t')
+    dfs.append(df)
+
+# Saving file
+map = pd.concat(dfs)
+map.sort_values(by='%unambiguousReads', inplace=True, ascending=False)
+
+# Concatenating all covstats files
+dfs = []
+for file in os.listdir(norm_phage):
+    path = os.path.join(norm_phage, file, 'covstats.tsv')
+    df = pd.read_csv(path, sep='\t')
+    dfs.append(df)
+
+# Saving file
+cov = pd.concat(dfs)
+cov.sort_values(by='Avg_fold', inplace=True, ascending=False)
+
+# Saving files
+map.to_csv('mapping_Norm_stats_summary.tsv', sep='\t', index=False)
+cov.to_csv('coverage_Norm_stats_summary.tsv', sep='\t', index=False)
