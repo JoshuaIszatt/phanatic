@@ -136,6 +136,11 @@ for pair in pairs:
             ji.logfile("Normalised / subsampled read mapping to phage contigs", f"{pair.name}", logs)
             ji.map_reads(filtered, assemble_reads, mapped2, pair.name)
 
+    # Mapping filter! !!! 80% of target coverage
+    #
+    #
+    #
+    
     # Extractions
     complete_genomes = os.path.join(checkv, "complete_genomes.tsv")
     quality_summary = os.path.join(checkv, "quality_summary.tsv")

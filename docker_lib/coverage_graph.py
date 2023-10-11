@@ -115,3 +115,5 @@ for directory in dirs:
                 print(e)
     else:
         print("error")
+
+# Analysing base coverage for > 5000bp segment in host mapped phage reads
