@@ -119,6 +119,7 @@ for directory in dirs:
 ##############################################################################################
 
 # Need to make it so that sample IDs are added into the first column before the headers
+# And make a proper summary table (phage library)
 sys.exit()
 
 dfs = []

@@ -174,21 +174,22 @@ for pair in pairs:
         os.makedirs(extraction_dir)
 
     # Looping through contigs
-    contig_file = os.path.join(output, 'contig_mapping_check.csv')
+    contig_file = os.path.join(output, 'contig_summary.csv')
     if not os.path.exists(contig_file):
-        ji.create_csv(contig_file, "sample,contig_name,avg_coverage,cov_status,phage_mapped_(%),mapped_status")
+        ji.create_csv(contig_file, "sample,contig_name,norm_coverage,cov_status,phage_QC_mapped_(%),mapped_status")
     genomes = []
     for header in headers:
         
         # Mapping filter: 80% of target coverage
         ji.logfile("Coverage filtering", f"Scanning: {header}", logs)
-        covstat = os.path.join(mapped, pair.name, 'covstats.tsv')
+        covstat = os.path.join(mapped2, pair.name, 'covstats.tsv')
         scafstat = os.path.join(mapped, pair.name, 'scafstats.tsv')
         
         # Coverage filter
         coverage, coverage_target = ji.covstat_filter(header, covstat)
         perc_mapped, perc_target = ji.scafstat_filter(header, scafstat)
         
+        # Assessing None values
         if coverage is None:
             ji.logfile("Coverage check failed", f"Check {header} coverage", logs)
         if perc_mapped is None:
@@ -199,8 +200,8 @@ for pair in pairs:
             cov_pass = "PASS"
             ji.logfile("Coverage check PASSED", header, logs)
         else:
-            cov_pass = "FAIL"
-            ji.logfile("Coverage check: FAILED", header, logs)
+            cov_pass = "WARNING"
+            ji.logfile("Coverage check: WARNING, low norm cov detected", header, logs)
 
         # Logging file data
         if perc_mapped >= perc_target:
@@ -211,12 +212,10 @@ for pair in pairs:
             ji.logfile("Percentage mapping check: FAILED", header, logs)
         
         # Recording data
-        ji.append_csv(pair.name, contig_file, f"{header},{coverage},{cov_pass},{perc_mapped},{perc_pass}")
+        ji.append_csv(contig_file, f"{pair.name},{header},{coverage},{cov_pass},{perc_mapped},{perc_pass}")
         
         # PASS / FAIL
-        if cov_pass == 'FAIL':
-            continue
-        elif perc_pass == 'FAIL':
+        if perc_pass == 'FAIL':
             continue
         
         # Genome extraction from filtered contigs
@@ -231,7 +230,8 @@ for pair in pairs:
     # Host mapping process
     if enable_host_mapping:
         
-        # Mapping QC reads to host genome (For contamination check and signs of transduction by % mapped reads)    
+        # Mapping QC reads to host genome (For contamination check and signs of transduction by % mapped reads)
+        host = None
         host = ji.host_csv_scan(host_mapping_file, pair.read_1, pair.read_2)
         if host is not None:
             bacteria_name = os.path.basename(host).replace(".fasta", "")
