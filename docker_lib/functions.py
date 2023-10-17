@@ -372,35 +372,36 @@ def barcode_phage(original, tag, outdir):
     logfile("BARCODE", f"{original_name}:{tag}", logs)
 
 def host_csv_scan(mapping_file, read_1, read_2):
-    read_1 = os.path.basename(read_1)
-    read_2 = os.path.basename(read_2)
-    rows = []
+    
+    # Initialising
+    host = None
+    r1 = os.path.basename(read_1)
+    r2 = os.path.basename(read_2)
+    
+    # Grabbing host from row
     with open(mapping_file, newline='') as file:
         reader = csv.reader(file, delimiter=',', quotechar='|')
         for row in reader:
             if row[0] == 'host':
                 continue
-            elif os.path.basename(read_1) == row[1] and os.path.basename(read_2) == row[2]:
-                rows.append(row)
-            elif not os.path.exists(os.path.join("/assemble/input", row[0])):
-                continue
-            elif not os.path.exists(os.path.join("/assemble/input", row[1])):
-                continue
-            elif not os.path.exists(os.path.join("/assemble/input", row[2])):
-                continue
-
+            elif r1 == row[1] and r2 == row[2]:
+                host = row[0]
+                break
     
-    if len(rows) > 1:
-        logfile("ERROR", f"Duplicate read host pairings found", logs)
-        return None
-    elif len(rows) == 1:
-        logfile(f"Host Identified for {read_1}", f"{row[0]}", logs)
-        return os.path.join("/assemble/input", row[0])
-    elif len(rows) == 0:
+    # Checking if host was found
+    if host is None:
         logfile("No host identified", f"---", logs)
-        return None
     else:
+        path = os.path.join("/assemble/input", host)
+    
+    # Checking path to host exists
+    if os.path.exists(path):
+        logfile(f"Host Identified for {r1}", f"{host}", logs)
+        return path
+    else:
+        logfile(f"ERROR: file path to host is invalid", f"{path}", logs)
         return None
+
 
 def covstat_filter(header, covstat):
     cov = None
