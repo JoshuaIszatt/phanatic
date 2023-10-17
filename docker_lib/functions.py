@@ -391,16 +391,17 @@ def host_csv_scan(mapping_file, read_1, read_2):
     # Checking if host was found
     if host is None:
         logfile("No host identified", f"---", logs)
+        return None
     else:
         path = os.path.join("/assemble/input", host)
     
-    # Checking path to host exists
-    if os.path.exists(path):
-        logfile(f"Host Identified for {r1}", f"{host}", logs)
-        return path
-    else:
-        logfile(f"ERROR: file path to host is invalid", f"{path}", logs)
-        return None
+        # Checking path to host exists
+        if os.path.exists(path):
+            logfile(f"Host Identified for {r1}", f"{host}", logs)
+            return path
+        else:
+            logfile(f"ERROR: file path to host is invalid", f"{path}", logs)
+            return None
 
 
 def covstat_filter(header, covstat):
