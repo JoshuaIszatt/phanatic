@@ -88,6 +88,7 @@ fastqc = True
 barcode = False
 mapping = True
 re_assembly = True
+identify_termini = False
 
 [system]
 RAM = 24000m

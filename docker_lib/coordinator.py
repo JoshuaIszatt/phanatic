@@ -156,7 +156,7 @@ for pair in pairs:
     # Making summary file
     sample_file = os.path.join(output, 'sample_summary.csv')
     if not os.path.exists(sample_file):
-        ji.create_csv(sample_file, "sample,genomes,status")
+        ji.create_csv(sample_file, "sample,genomes,sample_status")
     
     if len(headers) == 0:
         ji.logfile("Sample failed", pair.name, logs)
@@ -329,7 +329,7 @@ Host mapping genomes:
     - Philipson et al, (2018), Characterizing Phage Genomes for Therapeutic Applications
     
     
-    
+
 So what metrics do we need for this:
 
     More than 90% reads mapping to phage contig scafstats.txt from QC to phage mapped

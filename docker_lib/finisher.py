@@ -116,61 +116,104 @@ for directory in dirs:
     else:
         print("error")
 
-##############################################################################################
+######
+'''
+The below section may or may not be necessary, it concatenates data for all contigs > 1000bp including:
+    > Mapping statistics from cov and scaf files from QC reads
+    > checkv statistics from quality summary, completeness, and contamination files
+'''
+######
 
-# Need to make it so that sample IDs are added into the first column before the headers
-# And make a proper summary table (phage library)
-sys.exit()
+def filescan(dir, filetype):
+    dfs = []
+    for file in os.listdir(dir):
+        path = os.path.join(dir, file, filetype)
+        if path.endswith('.tsv'):
+            df = pd.read_csv(path, sep='\t')
+        elif path.endswith('.csv'):
+            df = pd.read_csv(path)
+        else:
+            print(f"Error reading {path}")
+            continue
+        
+        # Adding to list
+        df.insert(0, 'sample', file)
+        dfs.append(df)
+        
+    df = pd.concat(dfs)
+    return df
+    
+# Preparing function parameters
+outdir = '/assemble/output/'
 
-dfs = []
-for file in os.listdir(qc_phage):
-    path = os.path.join(qc_phage, file, 'scafstats.tsv')
-    df = pd.read_csv(path, sep='\t')
-    dfs.append(df)
+# CheckV files
+checkv_dir = os.path.join(outdir, "checkv")
+qual = "quality_summary.tsv"
+comp = "completeness.tsv"
+cont = "contamination.tsv"
 
-# Saving file
-map = pd.concat(dfs)
-map.sort_values(by='%unambiguousReads', inplace=True, ascending=False)
+try:
+    df = filescan(checkv_dir, qual)
+    cols = ['provirus', 'proviral_length', 'viral_genes', 'host_genes', 'provirus', 'proviral_length', 'kmer_freq']
+    df = df.drop(columns=cols)
+    df2 = filescan(checkv_dir, comp)
+    df3 = filescan(checkv_dir, cont)
+    
+    # Merging
+    checkv = df.merge(df2, on=['sample','contig_id', 'contig_length']).merge(df3, on=['sample','contig_id', 'contig_length'])
+    
+except Exception as e:
+    print(f"ERROR {e}")
 
-# Concatenating all covstats files
-dfs = []
-for file in os.listdir(qc_phage):
-    path = os.path.join(qc_phage, file, 'covstats.tsv')
-    df = pd.read_csv(path, sep='\t')
-    dfs.append(df)
+# Coverage files
+qc_dir = os.path.join(outdir, 'mapping_QC_to_phage')
+covstat = 'covstats.tsv'
+scafstat = 'scafstats.tsv'
 
-# Saving file
-cov = pd.concat(dfs)
-cov.sort_values(by='Avg_fold', inplace=True, ascending=False)
+try:
+    df = filescan(qc_dir, covstat)
+    df2 = filescan(qc_dir, scafstat)
+    
+    # Merging
+    df.rename(columns={'#ID' : 'contig_id'}, inplace=True)
+    df2.rename(columns={'#name' : 'contig_id'}, inplace=True)
+    coverage = df.merge(df2, on=['sample', 'contig_id'])
+    
+except Exception as e:
+    print(f"ERROR {e}")
 
-# Saving files
-map.to_csv('mapping_QC_stats_summary.tsv', sep='\t', index=False)
-cov.to_csv('coverage_QC_stats_summary.tsv', sep='\t', index=False)
+# Final merge
+merge = coverage.merge(checkv, on=['sample', 'contig_id'])
 
-##############################################################################################
+# Saving file 
+outfile = os.path.join(outdir, 'raw_data.csv')
+merge.to_csv(outfile, index=False)
 
-# Concatenating all scafstats files  
-dfs = []
-for file in os.listdir(norm_phage):
-    path = os.path.join(norm_phage, file, 'scafstats.tsv')
-    df = pd.read_csv(path, sep='\t')
-    dfs.append(df)
+######
+'''
+The below summary file also needs to answer the following questions:
+    > Do the mapped QC reads produce a genome of exact same size when re assembled? (Present as yes/no)
+    > Do the mapped QC reads assembly contain any other contigs >1000bp ? (Present as number of contigs >1000bp)
+    > Do the unmapped reads assemble into anything above 1000bp ? (Present as number of contigs >1000bp)
+'''
+######
 
-# Saving file
-map = pd.concat(dfs)
-map.sort_values(by='%unambiguousReads', inplace=True, ascending=False)
+# Attempting summary file
+try:
+    
+    # Creating summary files
+    contig_sum = os.path.join(outdir, 'sample_summary.csv')
+    sample_sum = os.path.join(outdir, 'contig_summary.csv')
 
-# Concatenating all covstats files
-dfs = []
-for file in os.listdir(norm_phage):
-    path = os.path.join(norm_phage, file, 'covstats.tsv')
-    df = pd.read_csv(path, sep='\t')
-    dfs.append(df)
+    # Reading, merging, sorting
+    df = pd.read_csv(contig_sum)
+    df2 = pd.read_csv(sample_sum)
+    merge = df.merge(df2, on='sample', how='outer')
+    merge.sort_values(by='phage_QC_mapped_(%)', ascending=False, inplace=True)
 
-# Saving file
-cov = pd.concat(dfs)
-cov.sort_values(by='Avg_fold', inplace=True, ascending=False)
+    # Saving file
+    outfile = os.path.join(outdir, 'combined_summary.csv')
+    merge.to_csv(outfile, index=False)
 
-# Saving files
-map.to_csv('mapping_Norm_stats_summary.tsv', sep='\t', index=False)
-cov.to_csv('coverage_Norm_stats_summary.tsv', sep='\t', index=False)
+except Exception as e:
+    print(f"ERROR: {e}")

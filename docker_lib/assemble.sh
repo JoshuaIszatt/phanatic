@@ -20,9 +20,9 @@ python /assemble/bin/coordinator.py
 chmod -R 777 /assemble/output/*
 
 # Running image gen
-echo "Generating coverage graphs"
+echo "Generating coverage graphs and summarising data"
 conda deactivate
-python /assemble/bin/coverage_graph.py
+python /assemble/bin/finisher.py
 
 if (($SECONDS > 3600)); then
     let "hours=SECONDS/3600"
