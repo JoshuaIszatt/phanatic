@@ -6,6 +6,7 @@ Home-page: https://github.com/JoshuaIszatt/Phanatic
 Author: Joshua Iszatt
 Author-email: joshiszatt@gmail.com
 License: AGPL-3.0
+Platform: UNKNOWN
 Classifier: Development Status :: 2 - Pre-Alpha
 Classifier: License :: OSI Approved :: GNU Affero General Public License v3
 Classifier: Programming Language :: Python :: 3
@@ -16,3 +17,6 @@ Classifier: Programming Language :: Python :: 3.9
 Classifier: Programming Language :: Python :: 3.10
 Requires-Python: >=3.6
 License-File: LICENSE.md
+
+UNKNOWN
+
