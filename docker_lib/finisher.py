@@ -198,20 +198,19 @@ The below summary file also needs to answer the following questions:
 '''
 ######
 
-# Attempting summary file
+# Building summary file
 try:
-    
-    # Creating summary files
+    # Reading merge files
     contig_sum = os.path.join(outdir, 'sample_summary.csv')
     sample_sum = os.path.join(outdir, 'contig_summary.csv')
-
-    # Reading, merging, sorting
     df = pd.read_csv(contig_sum)
     df2 = pd.read_csv(sample_sum)
+
+    # Merging + sorting
     merge = df.merge(df2, on='sample', how='outer')
     merge.sort_values(by='phage_QC_mapped_(%)', ascending=False, inplace=True)
 
-    # Saving file
+    # Saving
     outfile = os.path.join(outdir, 'combined_summary.csv')
     merge.to_csv(outfile, index=False)
 
