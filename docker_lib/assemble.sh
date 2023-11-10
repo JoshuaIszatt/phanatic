@@ -23,6 +23,7 @@ chmod -R 777 /assemble/output/*
 echo "Generating coverage graphs and summarising data"
 conda deactivate
 python /assemble/bin/finisher.py
+chmod -R 777 /assemble/output/*
 
 if (($SECONDS > 3600)); then
     let "hours=SECONDS/3600"

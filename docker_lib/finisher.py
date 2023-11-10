@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 #
 
-# Coverage checking script
 import os
 import sys
 import matplotlib.pyplot as plt
 import pandas as pd
+
+### Functions
 
 def generate_coverage_graph(covstats, basecov, outdir):
 
@@ -91,6 +92,8 @@ def generate_coverage_graph(covstats, basecov, outdir):
     # Save the plot as an image file (e.g., PNG)
     outfile = os.path.join(outdir, f"{contig}.png")
     plt.savefig(outfile, dpi = 300)
+
+########################################################################
 
 # Directories
 qc_phage = '/assemble/output/mapping_QC_to_phage'
