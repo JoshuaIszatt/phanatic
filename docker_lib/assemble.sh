@@ -19,10 +19,15 @@ echo "Running coordinator script"
 python /assemble/bin/coordinator.py
 chmod -R 777 /assemble/output/*
 
-# Running image gen
+# Running finisher
 echo "Generating coverage graphs and summarising data"
 conda deactivate
 python /assemble/bin/finisher.py
+chmod -R 777 /assemble/output/*
+
+# Running hash process
+echo "Generating hash keys for data"
+python /assemble/bin/data_sec.py
 chmod -R 777 /assemble/output/*
 
 if (($SECONDS > 3600)); then
