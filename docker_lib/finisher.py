@@ -194,14 +194,24 @@ merge.to_csv(outfile, index=False)
 
 ######
 '''
-The below summary file also needs to answer the following questions:
+
+The below summary files need to answer the following questions:
     > Do the mapped QC reads produce a genome of exact same size when re assembled? (Present as yes/no)
     > Do the mapped QC reads assembly contain any other contigs >1000bp ? (Present as number of contigs >1000bp)
     > Do the unmapped reads assemble into anything above 1000bp ? (Present as number of contigs >1000bp)
+
+mapped_assembly.csv should contain the mapped putative genome name, 
+the name of the first NODE in the mapped reassembly, and the number of genomes >1000bp
+
+unmapped_assembly.csv should contain the mapped putative genome name, and the number of
+genomes >1000bp within the assembly
+
+^^^ Potentially all in one file??? 
+
 '''
 ######
 
-# Building summary file
+# Building combined summary file
 try:
     # Reading merge files
     contig_sum = os.path.join(outdir, 'sample_summary.csv')
@@ -219,3 +229,6 @@ try:
 
 except Exception as e:
     print(f"ERROR: {e}")
+
+# Building reassembly_summary.csv
+# Assessing transduction using basecov for host

@@ -11,8 +11,10 @@ output = '/assemble/output'
 
 # Hash function
 def generate_sha256_hash(path):
-    hash_object = hashlib.sha256(path.encode())  # Encodes the string then computes hash
-    hex = hash_object.hexdigest()  # Obtains the hexadecimal representation of the hash (hash key)
+    with open(path, 'rb') as file:
+        file_contents = file.read()
+    hash_object = hashlib.sha256(file_contents)
+    hex = hash_object.hexdigest()
     return hex
 
 # Initialising 
@@ -42,8 +44,8 @@ for file in os.listdir(format_dir):
 # Hashing files
 hash_entries = []
 for file_path in hash_files:
-    hash_key = generate_sha256_hash(file_path)
     basename = os.path.basename(file_path)
+    hash_key = generate_sha256_hash(file_path)
     hash_entries.append((basename, hash_key))
 
 # Creating dataframe
