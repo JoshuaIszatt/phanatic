@@ -36,7 +36,7 @@ for file in files:
         hash_files.append(file)
 
 # Adding format_dir phage files
-format_dir = os.path.join(output, 'format_dir')
+format_dir = os.path.join(output, 'phage_genomes')
 for file in os.listdir(format_dir):
     path = os.path.join(format_dir, file)
     hash_files.append(path)

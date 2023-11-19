@@ -48,7 +48,7 @@ spades_dir = os.path.join(output, "initial_assembly")
 filtered_dir = os.path.join(output, "filtered_contigs")
 checkv_dir = os.path.join(output, "checkv")
 extraction_dir = os.path.join(output, "genome_extractions")
-format_dir = os.path.join(output, "format_dir")
+format_dir = os.path.join(output, "phage_genomes")
 barcode_dir = os.path.join(output, "barcode_phage")
 
 if enable_mapping:
@@ -85,6 +85,12 @@ for pair in pairs:
         deduped = ji.remove_duplicate_reads(trim, dedupe_dir, pair.name)
     else:
         continue
+
+    # Removing trimmed reads
+    try:
+        os.remove(trim)
+    except Exception as e:
+        ji.logfile(f"Error: {trim} could not be removed", f"{e}", logs)
 
     # Normalising reads
     if ji.check_filepath(deduped):
