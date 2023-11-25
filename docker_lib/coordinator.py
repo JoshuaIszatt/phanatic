@@ -33,6 +33,7 @@ try:
     enable_barcodes = config.getboolean("pipeline", "barcode")
     enable_mapping = config.getboolean("pipeline", "mapping")
     enable_reassembly = config.getboolean("pipeline", "re_assembly")
+    enable_reassembly = config.getboolean("pipeline", "identify_termini")
 except ValueError:
     sys.exit("Config file incorrectly set, pipeline values must be booleans")
 

@@ -84,7 +84,8 @@ def check_filepath(filepath, create=False):
             sys.exit(1)
 
 def generate_unique_tag(existing_tags):
-    characters = "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    # characters = "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    characters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
     while True:
         password = "".join(random.sample(characters, barcode_length))
         tag = f"{prefix}_{password}"
@@ -420,7 +421,7 @@ def covstat_filter(header, covstat):
     
     if cov:
         return cov, cut
-        
+
 def scafstat_filter(header, scafstat):
     perc_mapped = None
     # Obtaining unambig % mapped reads

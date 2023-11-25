@@ -11,6 +11,9 @@ def generate_sha256_hash(path):
 
 def check_task(output):
 
+    # Initialising
+    error = False
+
     # Initialising 
     hash_files = []
 
@@ -78,9 +81,14 @@ def check_task(output):
     if len(missing_files) > 0:
         for file in missing_files:
             print(f"Warning, file is missing: {file}")
+            error = True
     
     if len(changed_files) > 0:
         for file in changed_files:
             print(f"Warning, file hash has changed: {file}")
+            error = True
+
+    if not error:
+        print("No errors detected")
 
     return missing_files, changed_files
