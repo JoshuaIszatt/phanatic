@@ -33,7 +33,7 @@ try:
     enable_barcodes = config.getboolean("pipeline", "barcode")
     enable_mapping = config.getboolean("pipeline", "mapping")
     enable_reassembly = config.getboolean("pipeline", "re_assembly")
-    enable_reassembly = config.getboolean("pipeline", "identify_termini")
+    enable_phageterm = config.getboolean("pipeline", "identify_termini")
 except ValueError:
     sys.exit("Config file incorrectly set, pipeline values must be booleans")
 
@@ -183,32 +183,32 @@ for pair in pairs:
     # Looping through contigs
     contig_file = os.path.join(output, 'contig_summary.csv')
     if not os.path.exists(contig_file):
-        ji.create_csv(contig_file, "sample,contig_name,norm_coverage,cov_status,phage_QC_mapped_(%),mapped_status")
+        ji.create_csv(contig_file, "sample,contig_name,normalised_seq_depth,QC_seq_depth,phage_QC_mapped_(%),mapped_status")
     genomes = []
     for header in headers:
-        
-        # Mapping filter: 80% of target coverage
         ji.logfile("Coverage filtering", f"Scanning: {header}", logs)
-        covstat = os.path.join(mapped2, pair.name, 'covstats.tsv')
-        scafstat = os.path.join(mapped, pair.name, 'scafstats.tsv')
         
-        # Coverage filter
-        coverage, coverage_target = ji.covstat_filter(header, covstat)
+        # Depth check (normalised reads)
+        covstat = os.path.join(mapped2, pair.name, 'covstats.tsv')
+        norm_depth, coverage_target = ji.covstat_filter(header, covstat)
+
+        # Percentage mapping (QC reads)
+        scafstat = os.path.join(mapped, pair.name, 'scafstats.tsv')
         perc_mapped, perc_target = ji.scafstat_filter(header, scafstat)
         
         # Assessing None values
-        if coverage is None:
+        if norm_depth is None:
             ji.logfile("Coverage check failed", f"Check {header} coverage", logs)
         if perc_mapped is None:
             ji.logfile("Mapping percentage check failed", f"Check {header} QC mapping", logs)
 
         # Logging file data
-        if coverage >= coverage_target:
+        if norm_depth >= coverage_target:
             cov_pass = "PASS"
-            ji.logfile("Coverage check PASSED", header, logs)
+            ji.logfile("Normalised depth check PASSED", header, logs)
         else:
             cov_pass = "WARNING"
-            ji.logfile("Coverage check: WARNING, low norm cov detected", header, logs)
+            ji.logfile("Normalised depth check: WARNING", header, logs)
 
         # Logging file data
         if perc_mapped >= perc_target:
@@ -218,8 +218,12 @@ for pair in pairs:
             perc_pass = "FAIL"
             ji.logfile("Percentage mapping check: FAILED", header, logs)
         
+        # Depth check (QC reads)
+        covstat = os.path.join(mapped, pair.name, 'covstats.tsv')
+        qc_depth, coverage_target = ji.covstat_filter(header, covstat)
+
         # Recording data
-        ji.append_csv(contig_file, f"{pair.name},{header},{coverage},{cov_pass},{perc_mapped},{perc_pass}")
+        ji.append_csv(contig_file, f"{pair.name},{header},{norm_depth},{qc_depth},{perc_mapped},{perc_pass}")
         
         # PASS / FAIL
         if perc_pass == 'FAIL':
@@ -287,14 +291,6 @@ if enable_barcodes:
         if not os.path.exists(index):
             ji.create_csv(index, "sample_name,phage_ID")
         ji.append_csv(index, f"{file},{new_tag}.fasta")
-        
-    # Formatting
-    for file in os.listdir(barcode_dir):
-        filepath = os.path.join(barcode_dir, file)
-        genome = ji.format_genome(filepath, barcode_dir, file)
-        
-        if os.path.exists(genome):
-            os.system(f"rm {filepath}")
 
 # Phanatic finish
 ji.logfile("Phanatic base assembly finished", "-----", logs)

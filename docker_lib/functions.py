@@ -368,9 +368,25 @@ def fastqc(reads, outdir):
 
 def barcode_phage(original, tag, outdir):
     original_name = os.path.basename(original)
-    new = os.path.join(outdir, tag)
-    os.system(f"cp {original} {new}")
-    logfile("BARCODE", f"{original_name}:{tag}", logs)
+    new_file_path = os.path.join(outdir, tag)
+
+    try:
+        # Read original
+        with open(original, 'r') as original_file:
+            original_record = SeqIO.read(original_file, 'fasta')
+
+        # Update header
+        original_record.id = tag
+        original_record.description = tag
+
+        # Write barcode file
+        with open(f'{new_file_path}.fasta', 'w') as new_file:
+            SeqIO.write(original_record, new_file, 'fasta')
+
+        # Append to log
+        logfile("BARCODE", f"{original_name}:{tag}", logs)
+    except Exception as e:
+        logfile("BARCODE ERROR", f"ERROR: {original_name}{e}", logs)
 
 def host_csv_scan(mapping_file, read_1, read_2):
     
