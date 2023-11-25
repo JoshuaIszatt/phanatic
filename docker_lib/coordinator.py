@@ -47,7 +47,7 @@ norm_dir = os.path.join(output, "normalised")
 spades_dir = os.path.join(output, "initial_assembly")
 filtered_dir = os.path.join(output, "filtered_contigs")
 checkv_dir = os.path.join(output, "checkv")
-extraction_dir = os.path.join(output, "genome_extractions")
+extraction_dir = os.path.join(output, "contig_extractions")
 format_dir = os.path.join(output, "phage_genomes")
 barcode_dir = os.path.join(output, "barcode_phage")
 
@@ -261,11 +261,6 @@ for pair in pairs:
             if not os.path.getsize(qc_unmap) == 0:
                 unmapped_contigs = ji.PE_assembly(qc_unmap, outdir, "spades_unmapped")    
 
-            # Mapping QC phage_mapped reads to host genome (For transduction check of target phage, looking for regions >5000bp long)
-            #ji.logfile(f"Mapping phage reads to host", f"{name} reads mapped to {bacteria_name}", logs)
-            #ji.map_reads(host, qc_map, phage_host_mapping_dir, name)
-            
- 
     # Quality checks
     if enable_qc:
         ji.fastqc(assemble_reads, qc_dir) 

@@ -1,6 +1,7 @@
 LICENSE.md
 setup.py
 Phanatic/__init__.py
+Phanatic/check.py
 Phanatic/main.py
 Phanatic.egg-info/PKG-INFO
 Phanatic.egg-info/SOURCES.txt

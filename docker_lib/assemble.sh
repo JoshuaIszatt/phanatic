@@ -25,11 +25,7 @@ conda deactivate
 python /assemble/bin/finisher.py
 chmod -R 777 /assemble/output/*
 
-# Running hash process
-echo "Generating hash keys for data"
-python /assemble/bin/data_sec.py
-chmod -R 777 /assemble/output/*
-
+# Logging time
 if (($SECONDS > 3600)); then
     let "hours=SECONDS/3600"
     let "minutes=(SECONDS%3600)/60"
@@ -45,3 +41,8 @@ else
     echo " " >>/assemble/output/phanatic_log.tsv
     echo "[seconds:$SECONDS]" >>/assemble/output/phanatic_log.tsv
 fi
+
+# Running hash process
+echo "Generating hash keys" >>/assemble/output/phanatic_log.tsv
+python /assemble/bin/data_sec.py
+chmod -R 777 /assemble/output/*

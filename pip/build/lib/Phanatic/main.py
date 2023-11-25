@@ -6,6 +6,7 @@ def main():
     import argparse
     import random
     import pandas as pd
+    from .check import check_task
 
     # Did you know prompts
     prompts = [
@@ -30,6 +31,18 @@ def main():
                 f"{dir_path} is not a readable directory")
         return dir_path
 
+    def check_dir(dir_path):
+        if not os.path.isdir(dir_path):
+            raise argparse.ArgumentTypeError(
+                f"{dir_path} is not a valid directory path")
+        if not os.access(dir_path, os.R_OK):
+            raise argparse.ArgumentTypeError(
+                f"{dir_path} is not a readable directory")
+        keys = os.path.join(dir_path, '.hash_keys')
+        if not os.path.exists(keys):
+            raise argparse.ArgumentTypeError("no hash file exists")
+        return dir_path
+
     def valid_file(file_path):
         if not os.path.isfile(file_path):
             raise argparse.ArgumentTypeError(
@@ -41,15 +54,16 @@ def main():
 
     # Parsing arguments
     image = 'iszatt/phanatic:2.2.4'
-    parser = argparse.ArgumentParser(description=f"Easy short read assembly. Joshua J Iszatt: https://github.com/JoshuaIszatt")
+    parser = argparse.ArgumentParser(description=f"Phage genome assembly. Joshua J Iszatt: https://github.com/JoshuaIszatt")
 
     # Input/output options
     parser.add_argument('-i', '--input', type=valid_dir, help='Input reads files')
     parser.add_argument('-o', '--output', type=valid_dir, help='Direct output to this location')
-    parser.add_argument('-r', '--reads', type=str, choices=['PE_illumina_150'], default='PE_illumina_150', help='Pipeline options')
+    parser.add_argument('-r', '--reads', type=str, choices=['PE_illumina', 'ONT'], default='PE_illumina', help='Pipeline options')
     parser.add_argument('-c', '--config', type=valid_file, help='Use config file to customise assembly')
     parser.add_argument('--host_mapping', type=valid_file, help='Use an index file to specify host bacterial genome')
     parser.add_argument('-v', '--version', action="store_true", help='Print the docker image version')
+    parser.add_argument('--check', type=check_dir, help='Verify data integrity of ')
     parser.add_argument('--show_console', action="store_true", help='Include this flag to write output to console')
     parser.add_argument('--manual', action="store_true", help='Enter container interactively')
     args = parser.parse_args()
@@ -57,6 +71,10 @@ def main():
     # Printing version
     if args.version:
         print(image)
+        sys.exit(0)
+
+    if args.check:
+        check_task(args.check)
         sys.exit(0)
 
     # Obtaining absolute paths if entered correctly
@@ -69,7 +87,6 @@ def main():
         sys.exit("No input directory specified\nRun --help to see options")
     else:
         sys.exit("No input or output directories specified\nRun --help to see options")
-
 
     # Printing command variables
     print(
@@ -111,7 +128,6 @@ def main():
                 (docker, input_path, output_path, image)]
         result = subprocess.Popen(command, shell=True)
         print(command)
-
 
 if __name__ == "__main__":
     exit(main())
