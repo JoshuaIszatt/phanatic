@@ -4,7 +4,6 @@ setup(
     name="Phanatic",
     version="2.2.4",
     description="Python package to run de novo bacteriophage assembly container.",
-    url="https://github.com/JoshuaIszatt/Phanatic",
     author="Joshua Iszatt",
     author_email="joshiszatt@gmail.com",
     license="AGPL-3.0",

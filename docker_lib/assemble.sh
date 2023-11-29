@@ -42,6 +42,11 @@ else
     echo "[seconds:$SECONDS]" >>/assemble/output/phanatic_log.tsv
 fi
 
+# Cleaning up
+rmdir /assemble/output/trimmed
+rm -rf /assemble/output/contig_extractions
+rm -rf /assemble/output/filtered_contigs
+
 # Running hash process
 echo "Generating hash keys" >>/assemble/output/phanatic_log.tsv
 python /assemble/bin/data_sec.py

@@ -1,4 +1,5 @@
 import os
+import sys
 import pandas as pd
 import hashlib
 
@@ -17,7 +18,7 @@ def check_task(output):
     # Initialising 
     hash_files = []
 
-    # Find base files
+    # Find required files
     log = os.path.join(output, 'phanatic_log.tsv')
     raw = os.path.join(output, 'raw_data.csv')
     summary = os.path.join(output, 'combined_summary.csv')
@@ -26,13 +27,22 @@ def check_task(output):
     config = os.path.join(output, 'config.ini')
     mapping = os.path.join(output, 'host_mapping.csv')
 
-    # Checking files exist
-    files = [log, raw, summary, config, mapping]
+    # Checking required files exist
+    files = [log, raw, summary]
     for file in files:
         if os.path.exists(file):
             hash_files.append(file)
         else:
-            print(f"ERROR: {os.path.basename(file)} does not exist")
+            print(f"ERROR: {os.path.basename(file)} does not exist, cannot perform checks")
+            sys.exit(0)
+
+    # Checking optional files exist
+    files = [config, mapping]
+    for file in files:
+        if os.path.exists(file):
+            hash_files.append(file)
+        else:
+            print(f"File: {os.path.basename(file)} does not exist")
 
     # Adding format_dir phage files
     format_dir = os.path.join(output, 'phage_genomes')
