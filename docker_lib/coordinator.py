@@ -225,7 +225,7 @@ for pair in pairs:
         # Recording data
         ji.append_csv(contig_file, f"{pair.name},{header},{norm_depth},{qc_depth},{perc_mapped},{perc_pass}")
         
-        # PASS / FAIL
+        # PASS / FAIL checkpoint for read mapping
         if perc_pass == 'FAIL':
             continue
         
@@ -250,11 +250,17 @@ for pair in pairs:
             ji.map_reads(host, deduped, host_mapping_dir, f"{pair.name}_{bacteria_name}")
 
     # Looping through checkv genomes
-    formatted_genomes = []
     for genome in genomes:
         name = os.path.basename(genome).replace(".fasta", "")
         format_genome = ji.format_genome(genome, format_dir, name)
-        formatted_genomes.append(format_genome)
+
+        # Creating csv
+        assembly_check_file = os.path.join(output, 'mapping_reassembly.csv')
+        if not os.path.exists(assembly_check_file):
+            ji.create_csv(assembly_check_file, "sample,mapped_contig_size(1st),mapped_contig_count,unmapped_contig_count,mapped_contig_warning,unmapped_contig_warning,same_size_check")
+
+        # Scanning formatted genome
+        f_size, f_count, f_check = ji.contig_scan(format_genome)
 
         # Separating reads for mapped reassembly process
         if enable_reassembly:
@@ -265,6 +271,41 @@ for pair in pairs:
                 mapped_contigs = ji.PE_assembly(qc_map, outdir, "spades_mapped")
             if not os.path.getsize(qc_unmap) == 0:
                 unmapped_contigs = ji.PE_assembly(qc_unmap, outdir, "spades_unmapped")    
+
+        # Initialising values
+        m_warning, m_size, m_count, m_check = ['NA', 'NA', 'NA', 'NA']
+        u_warning, u_size, u_count, u_check = ['NA', 'NA', 'NA', 'NA']
+        matched = 'NA'
+
+        # Assessing mapped contigs 
+        if os.path.exists(mapped_contigs):
+            m_size, m_count, m_check = ji.contig_scan(mapped_contigs)
+
+            # If assemblies need checking
+            if m_check:
+                m_warning = 'yes'
+            else:
+                m_warning = 'no'
+            
+            # Does original (format genome) and mapped genome match?
+            if f_size == m_size:
+                matched = 'yes'
+            else:
+                matched = 'no'
+
+        # Assessing unmapped contigs
+        if os.path.exists(unmapped_contigs):
+            u_size, u_count, u_check = ji.contig_scan(unmapped_contigs, False)
+
+            # If assemblies need checking
+            if u_check:
+                u_warning = 'yes'
+            else:
+                u_warning = 'no'
+
+        # Collating data
+        ji.append_csv(assembly_check_file, f"{name},{m_size},{m_count},{u_count},{m_warning},{u_warning},{matched}")
+
 
     # Quality checks
     if enable_qc:
@@ -289,13 +330,12 @@ if enable_barcodes:
         # Producing index file
         index = os.path.join(output, 'index.csv')
         if not os.path.exists(index):
-            ji.create_csv(index, "sample_name,phage_ID")
+            ji.create_csv(index, "sample,phage_ID")
         ji.append_csv(index, f"{file},{new_tag}.fasta")
 
 # Phanatic finish
 ji.logfile("Phanatic base assembly finished", "-----", logs)
 os.system(f"chmod -R 777 {output}/*")
-
 
 '''
 Host mapping genomes:

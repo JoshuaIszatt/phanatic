@@ -223,6 +223,13 @@ try:
     merge = df.merge(df2, on='sample', how='outer')
     merge.sort_values(by='phage_QC_mapped_(%)', ascending=False, inplace=True)
 
+    # If barcodes are enabled
+    barcode_index = os.path.join(outdir, 'index.csv')
+    if os.path.exists(barcode_index):
+        barcodes = pd.read_csv(barcode_index)
+
+        # Have to split sample column into <sample_name,contig_name>
+
     # Saving
     outfile = os.path.join(outdir, 'combined_summary.csv')
     merge.to_csv(outfile, index=False)

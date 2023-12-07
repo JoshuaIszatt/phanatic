@@ -452,3 +452,34 @@ def scafstat_filter(header, scafstat):
     
     if perc_mapped:
         return perc_mapped, 90
+
+def contig_scan(contigs, mapped=True):
+    records = []
+    seqs = []
+    # Read original
+    for record in SeqIO.parse(contigs, 'fasta'):
+        records.append(len(record.seq))
+        
+        if len(record.seq) > 1000:
+            seqs.append(record)
+    
+    # Setting check status
+    if mapped:
+        if any(value > 1000 for value in records[1:]):
+            check = True
+        else:
+            check = False
+    else:
+        if any(value > 1000 for value in records):
+            check = True
+        else:
+            check = False
+
+    # Get info
+    try:
+        size = records[0]
+    except IndexError:
+        size = 'empty'
+    count = len(records)
+
+    return size, count, check

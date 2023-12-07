@@ -43,7 +43,7 @@ else
 fi
 
 # Cleaning up
-rmdir /assemble/output/trimmed
+rm -rf /assemble/output/trimmed
 rm -rf /assemble/output/contig_extractions
 rm -rf /assemble/output/filtered_contigs
 
