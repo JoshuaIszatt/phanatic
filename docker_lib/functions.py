@@ -460,6 +460,7 @@ def contig_scan(contigs, mapped=True):
     for record in SeqIO.parse(contigs, 'fasta'):
         records.append(len(record.seq))
         
+        # Keep records for checking downstream
         if len(record.seq) > 1000:
             seqs.append(record)
     

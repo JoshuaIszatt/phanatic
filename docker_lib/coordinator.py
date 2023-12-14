@@ -279,6 +279,8 @@ for pair in pairs:
 
         # Assessing mapped contigs 
         if os.path.exists(mapped_contigs):
+
+            # Obtain size of the 1st contig, the number of contigs
             m_size, m_count, m_check = ji.contig_scan(mapped_contigs)
 
             # If assemblies need checking
@@ -294,7 +296,7 @@ for pair in pairs:
                 matched = 'no'
 
         # Assessing unmapped contigs
-        if os.path.exists(unmapped_contigs):
+        if unmapped_contigs is not None and os.path.exists(unmapped_contigs):
             u_size, u_count, u_check = ji.contig_scan(unmapped_contigs, False)
 
             # If assemblies need checking
@@ -302,10 +304,12 @@ for pair in pairs:
                 u_warning = 'yes'
             else:
                 u_warning = 'no'
+        
+        else:
+            u_size, u_count, u_check, u_warning = 'N/A','N/A','N/A','N/A'
 
         # Collating data
         ji.append_csv(assembly_check_file, f"{name},{m_size},{m_count},{u_count},{m_warning},{u_warning},{matched}")
-
 
     # Quality checks
     if enable_qc:
