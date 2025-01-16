@@ -15,7 +15,7 @@ RUN mkdir -p /assemble \
     && mkdir -p /assemble/build \
     && mkdir -p /assemble/bin
 
-# Setting up software
+# Setting up external software
 WORKDIR /assemble/build
 RUN wget http://cab.spbu.ru/files/release3.15.4/SPAdes-3.15.4-Linux.tar.gz \
     && tar -xzf SPAdes-3.15.4-Linux.tar.gz \
@@ -23,13 +23,14 @@ RUN wget http://cab.spbu.ru/files/release3.15.4/SPAdes-3.15.4-Linux.tar.gz \
 
 ENV PATH="/assemble/build/SPAdes-3.15.4-Linux/bin:${PATH}"
 
-# Building environments and inputting script
+# Building virtual environment
 COPY ./assemble.txt /assemble/build
 RUN conda create --name assemble --file /assemble/build/assemble.txt \
     && conda init bash
 RUN echo "conda activate assemble" >> ~/.bashrc
 
-# Adding scripts
+# Adding scripts 
+# DEPRECATED !!!
 COPY ./docker_lib/* /assemble/bin/
 RUN echo 'export PATH="/assemble/bin:$PATH"' >> ~/.bashrc
 

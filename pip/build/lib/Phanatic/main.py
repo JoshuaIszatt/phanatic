@@ -63,7 +63,7 @@ def main():
     parser.add_argument('-c', '--config', type=valid_file, help='Use config file to customise assembly')
     parser.add_argument('--host_mapping', type=valid_file, help='Use an index file to specify host bacterial genome')
     parser.add_argument('-v', '--version', action="store_true", help='Print the docker image version')
-    parser.add_argument('--check', type=check_dir, help='Verify data integrity of ')
+    parser.add_argument('--check', type=check_dir, help='Verify data integrity of a phanatic output directory')
     parser.add_argument('--show_console', action="store_true", help='Include this flag to write output to console')
     parser.add_argument('--manual', action="store_true", help='Enter container interactively')
     args = parser.parse_args()
